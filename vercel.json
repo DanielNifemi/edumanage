@@ -1,23 +1,26 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "edumanage/wsgi.py",
+      "src": "build_files.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles_build"
+      }
+    },
+    {
+      "src": "/edumanage/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3" }
+      "config": { "maxLambdaSize": "16mb" }
     }
   ],
   "routes": [
     {
+      "src": "/(.*)",
+      "dest": "edumanage/wsgi.py"
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/static/$1"
-    },
-    {
-      "src": "requirements.txt"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "pollme/wsgi.py"
     }
   ]
 }
