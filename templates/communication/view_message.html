@@ -1,11 +1,68 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<style>
+    .classroom-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .message-header {
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .message-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    .message-meta {
+        color: #3c4043;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+    .message-meta strong {
+        color: #1a73e8;
+    }
+    .message-body {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        color: #3c4043;
+        line-height: 1.6;
+    }
+    .dashboard-link {
+        display: inline-block;
+        background-color: #1a73e8;
+        color: white;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    .dashboard-link:hover {
+        background-color: #1967d2;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>{{ message.subject }}</h2>
-<p><strong>From:</strong> {{ message.sender.username }}</p>
-<p><strong>To:</strong> {{ message.recipient.username }}</p>
-<p><strong>Date:</strong> {{ message.timestamp }}</p>
-<hr>
-<p>{{ message.body|linebreaks }}</p>
-<a href="{% url 'inbox' %}">Back to Inbox</a>
+<div class="classroom-container">
+    <div class="message-header">
+        <h2 class="message-title">{{ message.subject }}</h2>
+        <p class="message-meta"><strong>From:</strong> {{ message.sender.username }}</p>
+        <p class="message-meta"><strong>To:</strong> {{ message.recipient.username }}</p>
+        <p class="message-meta"><strong>Date:</strong> {{ message.timestamp }}</p>
+    </div>
+
+    <div class="message-body">
+        {{ message.body|linebreaks }}
+    </div>
+
+    <a href="{% url 'inbox' %}" class="dashboard-link">Back to Inbox</a>
+</div>
 {% endblock %}
