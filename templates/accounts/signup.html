@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block content %}
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 class="classroom-title">Sign Up for Your Class</h2>
+        <form method="post" class="classroom-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="classroom-button">Join Class</button>
+        </form>
+        <p class="classroom-text">Already enrolled? <a href="{% url 'account_login' %}" class="classroom-link">Log In</a></p>
+        <div class="classroom-divider"></div>
+        <a href="{% provider_login_url 'google' %}" class="classroom-google-button">
+            <img src="path/to/google-icon.png" alt="Google Icon" class="google-icon">
+            Sign Up with Google
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .classroom-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f1f3f4;
+    }
+    .classroom-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+    }
+    .classroom-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .classroom-form {
+        margin-bottom: 20px;
+    }
+    .classroom-button {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+    .classroom-text {
+        font-size: 14px;
+        color: #5f6368;
+    }
+    .classroom-link {
+        color: #1a73e8;
+        text-decoration: none;
+    }
+    .classroom-divider {
+        border-top: 1px solid #e0e0e0;
+        margin: 20px 0;
+    }
+    .classroom-google-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #3c4043;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .classroom-google-button:hover {
+        background-color: #f8f9fa;
+    }
+    .google-icon {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}

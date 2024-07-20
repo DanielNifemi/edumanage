@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Sent Messages</h2>
+<a href="{% url 'compose_message' %}">Compose New Message</a>
+<table>
+    <thead>
+        <tr>
+            <th>To</th>
+            <th>Subject</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for message in messages %}
+        <tr>
+            <td>{{ message.recipient.username }}</td>
+            <td><a href="{% url 'view_message' message.id %}">{{ message.subject }}</a></td>
+            <td>{{ message.timestamp }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No sent messages.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

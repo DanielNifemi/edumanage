@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+    /* Include the common styles from previous examples here */
+    .classroom-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f1f3f4;
+    }
+    .classroom-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+    .classroom-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .classroom-message {
+        color: #3c4043;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    .classroom-button {
+        display: inline-block;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+    .classroom-form {
+        margin-bottom: 20px;
+    }
+    .classroom-form p {
+        margin-bottom: 15px;
+    }
+    .classroom-form input[type="date"],
+    .classroom-form select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 class="classroom-title">Generate Attendance Report</h2>
+        <form method="post" class="classroom-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="classroom-button">Generate Report</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

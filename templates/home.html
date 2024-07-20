@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Welcome to EduManage</h1>
+{% if user.is_authenticated %}
+    <p>Hello, {{ user.email }}!</p>
+    <a href="{% url 'dashboard' %}">Go to Dashboard</a>
+    <a href="{% url 'account_logout' %}">Logout</a>
+{% else %}
+    <p>Please log in or sign up to access the system.</p>
+    <a href="{% url 'account_login' %}">Login</a>
+    <a href="{% url 'account_signup' %}">Sign Up</a>
+{% endif %}
+{% endblock %}

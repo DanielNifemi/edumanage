@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Class Schedule for {{ class_group.name }}</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Day</th>
+            <th>Time</th>
+            <th>Subject</th>
+            <th>Teacher</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for schedule in schedules %}
+        <tr>
+            <td>{{ schedule.day }}</td>
+            <td>{{ schedule.time_slot }}</td>
+            <td>{{ schedule.subject }}</td>
+            <td>{{ schedule.teacher }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No schedules available for this class.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'add_schedule' %}">Add Schedule</a>
+{% endblock %}

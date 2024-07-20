@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Teacher Profile</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Update Profile</button>
+</form>
+<h3>Current Information</h3>
+<p>Name: {{ teacher.staff_profile.user.get_full_name }}</p>
+<p>Qualification: {{ teacher.qualification }}</p>
+<p>Years of Experience: {{ teacher.years_of_experience }}</p>
+<h4>Subjects:</h4>
+<ul>
+    {% for subject in teacher.subjects.all %}
+    <li>{{ subject.name }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

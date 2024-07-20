@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Discipline Record for {{ student.full_name }}</h2>
+<h3>Disciplinary Records</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Infraction</th>
+            <th>Action Taken</th>
+            <th>Resolved</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.date }}</td>
+            <td>{{ record.infraction_type }}</td>
+            <td>{{ record.action_taken|default_if_none:"N/A" }}</td>
+            <td>{% if record.resolved %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No disciplinary records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'add_disciplinary_record' student.id %}">Add Disciplinary Record</a>
+
+<h3>Behavior Notes</h3>
+<ul>
+    {% for note in notes %}
+    <li>
+        <strong>{{ note.date }}</strong> - {{ note.note }}
+        <em>(Noted by: {{ note.noted_by }})</em>
+    </li>
+    {% empty %}
+    <li>No behavior notes found.</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_behavior_note' student.id %}">Add Behavior Note</a>
+{% endblock %}

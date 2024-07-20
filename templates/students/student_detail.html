@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Student Details: {{ student.user.get_full_name }}</h2>
+<p><strong>Student ID:</strong> {{ student.student_id }}</p>
+<p><strong>Date of Birth:</strong> {{ student.date_of_birth }}</p>
+<p><strong>Grade:</strong> {{ student.grade }}</p>
+<p><strong>Address:</strong> {{ student.address }}</p>
+<p><strong>Parent Name:</strong> {{ student.parent_name }}</p>
+<p><strong>Parent Contact:</strong> {{ student.parent_contact }}</p>
+
+<h3>Academic Records</h3>
+<a href="{% url 'academic_record_create' student.pk %}">Add Academic Record</a>
+<table>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Grade</th>
+            <th>Semester</th>
+            <th>Year</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in academic_records %}
+        <tr>
+            <td>{{ record.subject }}</td>
+            <td>{{ record.grade }}</td>
+            <td>{{ record.semester }}</td>
+            <td>{{ record.year }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No academic records found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'student_update' student.pk %}">Edit Student Information</a>
+<a href="{% url 'student_list' %}">Back to Student List</a>
+{% endblock %}
