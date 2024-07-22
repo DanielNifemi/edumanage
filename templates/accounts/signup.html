@@ -1,26 +1,6 @@
 {% extends 'base.html' %}
 {% load socialaccount %}
-
-{% block content %}
-<div class="classroom-container">
-    <div class="classroom-card">
-        <h2 class="classroom-title">Sign Up for Your Class</h2>
-        <form method="post" class="classroom-form">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="classroom-button">Join Class</button>
-        </form>
-        <p class="classroom-text">Already enrolled? <a href="{% url 'account_login' %}" class="classroom-link">Log In</a></p>
-        <div class="classroom-divider"></div>
-        <a href="{% provider_login_url 'google' %}" class="classroom-google-button">
-            <img src="path/to/google-icon.png" alt="Google Icon" class="google-icon">
-            Sign Up with Google
-        </a>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_css %}
+{% block extra_head %}
 <style>
     .classroom-container {
         display: flex;
@@ -92,4 +72,22 @@
         margin-right: 10px;
     }
 </style>
+{% endblock %}
+{% block content %}
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 class="classroom-title">Sign Up for Your Class</h2>
+        <form method="post" class="classroom-form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="classroom-button">Join Class</button>
+        </form>
+        <p class="classroom-text">Already enrolled? <a href="{% url 'account_login' %}" class="classroom-link">Log In</a></p>
+        <div class="classroom-divider"></div>
+        <a href="{% provider_login_url 'google' %}" class="classroom-google-button">
+            <img src="path/to/google-icon.png" alt="Google Icon" class="google-icon">
+            Sign Up with Google
+        </a>
+    </div>
+</div>
 {% endblock %}

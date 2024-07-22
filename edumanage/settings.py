@@ -97,7 +97,7 @@ TEMPLATES = [
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'redirect_uri': 'http://localhost:8000/accounts/login/',
+        'redirect_uri': 'https://edumanage-eta.vercel.app/accountsgoogle/login/callback/',
         'SCOPE': [
             'profile',
             'email',
@@ -120,8 +120,12 @@ WSGI_APPLICATION = 'edumanage.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'defaultdb',
+        'USER': 'avnadmin',
+        'PASSWORD': 'AVNS_L2l5tFQQuzSUeNucY6s',
+        'HOST': 'pg-3a87de02-edumanage-postgresql.h.aivencloud.com',
+        'PORT': '16383',
     }
 }
 
