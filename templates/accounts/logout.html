@@ -1,31 +1,6 @@
 {% extends 'base.html' %}
-
-{% block content %}
-<div class="login-container">
-    <h2 class="login-title">Log In</h2>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                    <small style="color: red;">{{ field.errors|striptags }}</small>
-                {% endif %}
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn-login">Log In</button>
-    </form>
-    <p class="signup-link">Don't have an account? <a href="{% url 'account_signup' %}">Sign Up</a></p>
-    <hr>
-    <a href="{% provider_login_url 'google' %}" class="google-login">
-        <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
-        Log In with Google
-    </a>
-</div>
-{% endblock %}
-
-{% block extra_css %}
+{% load socialaccount %}
+{% block extra_head %}
 <style>
     .classroom-container {
         display: flex;
@@ -68,4 +43,28 @@
         background-color: #1967d2;
     }
 </style>
+{% endblock %}
+{% block content %}
+<div class="login-container">
+    <h2 class="login-title">Log In</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <small style="color: red;">{{ field.errors|striptags }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn-login">Log In</button>
+    </form>
+    <p class="signup-link">Don't have an account? <a href="{% url 'account_signup' %}">Sign Up</a></p>
+    <hr>
+    <a href="{% provider_login_url 'google' %}" class="google-login">
+        <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
+        Log In with Google
+    </a>
+</div>
 {% endblock %}
