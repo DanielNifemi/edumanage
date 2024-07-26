@@ -18,3 +18,5 @@ tzdata==2024.1
 urllib3==2.2.2
 vercel==0.2.1
 Werkzeug==3.0.3
+matplotlib~=3.9.1
+django-ckeditor

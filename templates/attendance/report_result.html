@@ -56,16 +56,13 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="classroom-container">
-    <div class="classroom-card">
-        <h2 class="classroom-title">Attendance Report</h2>
-        <div class="report-info">
-            <p><strong>Student:</strong> {{ report.student.username }}</p>
-            <p><strong>Period:</strong> {{ report.start_date }} to {{ report.end_date }}</p>
-            <p><strong>Total Days:</strong> {{ report.total_days }}</p>
-            <p><strong>Days Present:</strong> {{ report.days_present }}</p>
-            <p><strong>Attendance Percentage:</strong> {{ report.days_present|div:report.total_days|mul:100|floatformat:2 }}%</p>
-        </div>
-    </div>
-</div>
+<h2>Attendance Report</h2>
+<p>Student: {{ report.student.username }}</p>
+<p>Period: {{ report.start_date }} to {{ report.end_date }}</p>
+<p>Total Days: {{ report.total_days }}</p>
+<p>Days Present: {{ report.days_present }}</p>
+<p>Attendance Percentage: {{ report.days_present|divisiblesafe:report.total_days|multiply:100 }}%</p>
+
+<h3>Attendance Graph</h3>
+<img src="data:image/png;base64,{{ graph|safe }}" alt="Attendance Graph">
 {% endblock %}

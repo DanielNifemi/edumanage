@@ -1,81 +1,93 @@
 {% extends 'base.html' %}
-{% block extra_head %}
+{% block content %}
 <style>
     .classroom-container {
-        max-width: 800px;
+        max-width: 1000px;
         margin: 0 auto;
         padding: 20px;
     }
     .welcome-section {
-        background-color: #1967d2;
-        color: white;
-        padding: 20px;
-        border-radius: 8px;
         margin-bottom: 20px;
     }
     .welcome-title {
-        margin: 0;
+        color: #333;
+        display: inline-block;
+        margin-right: 10px;
     }
     .role-tag {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: #007bff;
+        color: #fff;
         padding: 5px 10px;
-        border-radius: 20px;
+        border-radius: 4px;
         font-size: 0.8em;
     }
     .dashboard-link {
         display: inline-block;
-        background-color: #1a73e8;
-        color: white;
+        margin-right: 10px;
+        margin-bottom: 20px;
         padding: 10px 15px;
+        background-color: #28a745;
+        color: #fff;
         text-decoration: none;
         border-radius: 4px;
-        margin-bottom: 20px;
     }
-    table {
+    .classroom-table {
         width: 100%;
         border-collapse: collapse;
     }
-    th, td {
-        padding: 10px;
-        border-bottom: 1px solid #e0e0e0;
+    .classroom-table th, .classroom-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
         text-align: left;
     }
-    th {
-        background-color: #f5f5f5;
+    .classroom-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .unread {
+        font-weight: bold;
+    }
+    .action-link {
+        margin-right: 5px;
+        color: #007bff;
+        text-decoration: none;
     }
 </style>
-{% endblock %}
-
-{% block content %}
 <div class="classroom-container">
     <div class="welcome-section">
-        <h2 class="welcome-title">Inbox</h2>
+        <h2 id="inbox" class="welcome-title">Inbox</h2>
         <span class="role-tag">Messages</span>
     </div>
 
     <a href="{% url 'compose_message' %}" class="dashboard-link">Compose New Message</a>
     <a href="{% url 'sent_messages' %}" class="dashboard-link">View Sent Messages</a>
 
-    <table>
+    <table class="classroom-table">
         <thead>
             <tr>
                 <th>From</th>
                 <th>Subject</th>
                 <th>Date</th>
                 <th>Read</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for message in messages %}
-            <tr>
+            <tr {% if not message.is_read %}class="unread"{% endif %}>
                 <td>{{ message.sender.username }}</td>
                 <td><a href="{% url 'view_message' message.id %}">{{ message.subject }}</a></td>
                 <td>{{ message.timestamp|date:"M d, Y H:i" }}</td>
                 <td>{% if message.is_read %}Yes{% else %}No{% endif %}</td>
+                <td>
+                    <a href="{% url 'delete_message' message.id %}" class="action-link">Delete</a>
+                    <a href="{% url 'forward_message' message.id %}" class="action-link">Forward</a>
+                    <a href="{% url 'reply_message' message.id %}" class="action-link">Reply</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4">No messages in your inbox.</td>
+                <td colspan="5">No messages in your inbox.</td>
             </tr>
             {% endfor %}
         </tbody>
