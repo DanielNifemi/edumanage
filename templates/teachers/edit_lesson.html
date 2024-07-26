@@ -55,50 +55,15 @@
     </style>
 </head>
 <div class="classroom-container">
-    <h1 id="my-lessons" class="classroom-header">My Lessons</h1>
+    <h1 id="edit-lesson" class="classroom-header">Edit Lesson</h1>
 
-    <a href="{% url 'add_lesson' %}" class="classroom-button">Add New Lesson</a>
-
-    <table class="classroom-table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Subject</th>
-                <th>Class</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Topic</th>
-                <th>YouTube Link</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for lesson in lessons %}
-            <tr>
-                <td>{{ lesson.date }}</td>
-                <td>{{ lesson.subject.name }}</td>
-                <td>{{ lesson.class_group.name }}</td>
-                <td>{{ lesson.start_time }}</td>
-                <td>{{ lesson.end_time }}</td>
-                <td>{{ lesson.topic }}</td>
-                <td>
-                    {% if lesson.youtube_link %}
-                    <a href="{{ lesson.youtube_link }}" target="_blank" class="classroom-link">View</a>
-                    {% else %}
-                    No link
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'edit_lesson' lesson.id %}" class="classroom-button">Edit</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8">No lessons scheduled yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="classroom-card">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="classroom-button">Update Lesson</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

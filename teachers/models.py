@@ -39,6 +39,7 @@ class Lesson(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     topic = models.CharField(max_length=200)
+    youtube_link = models.URLField(blank=True, null=True)  # New field
 
     def __str__(self):
         return f"{self.subject} - {self.class_group} - {self.date}"

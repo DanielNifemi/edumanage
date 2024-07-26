@@ -50,3 +50,16 @@ def teacher_lessons(request):
     teacher = get_object_or_404(Teacher, staff_profile__user=request.user)
     lessons = Lesson.objects.filter(teacher=teacher)
     return render(request, 'teachers/lessons.html', {'lessons': lessons})
+
+
+@login_required
+def edit_lesson(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id, teacher=request.user.staffprofile.teacher)
+    if request.method == 'POST':
+        form = LessonForm(request.POST, instance=lesson)
+        if form.is_valid():
+            form.save()
+            return redirect('teacher_lessons')
+    else:
+        form = LessonForm(instance=lesson)
+    return render(request, 'teachers/edit_lesson.html', {'form': form, 'lesson': lesson})

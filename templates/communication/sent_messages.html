@@ -1,72 +1,47 @@
 {% extends 'base.html' %}
-
 {% block extra_head %}
 <style>
     .classroom-container {
-        max-width: 1200px;
+        max-width: 800px;
         margin: 0 auto;
         padding: 20px;
     }
     .welcome-section {
-        background-color: #f1f3f4;
-        border-radius: 8px;
+        background-color: #1967d2;
+        color: white;
         padding: 20px;
+        border-radius: 8px;
         margin-bottom: 20px;
     }
     .welcome-title {
-        color: #1967d2;
-        font-size: 24px;
-        margin-bottom: 10px;
+        margin: 0;
     }
     .role-tag {
-        background-color: #1a73e8;
-        color: white;
+        background-color: rgba(255, 255, 255, 0.2);
         padding: 5px 10px;
-        border-radius: 16px;
-        font-size: 14px;
+        border-radius: 20px;
+        font-size: 0.8em;
     }
     .dashboard-link {
         display: inline-block;
         background-color: #1a73e8;
         color: white;
-        text-decoration: none;
         padding: 10px 15px;
+        text-decoration: none;
         border-radius: 4px;
         margin-bottom: 20px;
-        transition: background-color 0.3s;
     }
-    .dashboard-link:hover {
-        background-color: #1967d2;
-    }
-    .classroom-table {
+    table {
         width: 100%;
         border-collapse: collapse;
     }
-    .classroom-table th,
-    .classroom-table td {
-        padding: 12px;
-        text-align: left;
+    th, td {
+        padding: 10px;
         border-bottom: 1px solid #e0e0e0;
+        text-align: left;
     }
-    .classroom-table th {
-        background-color: #f1f3f4;
-        font-weight: bold;
-        color: #3c4043;
-    }
-    .classroom-table tr:hover {
-        background-color: #f8f9fa;
-    }
-    .classroom-table a {
-        color: #1a73e8;
-        text-decoration: none;
-    }
-    .classroom-table a:hover {
-        text-decoration: underline;
-    }
-    .empty-message {
-        text-align: center;
-        color: #5f6368;
-        padding: 20px;
+    th {
+        background-color: #f5f5f5;
     }
 </style>
 {% endblock %}
@@ -79,8 +54,9 @@
     </div>
 
     <a href="{% url 'compose_message' %}" class="dashboard-link">Compose New Message</a>
+    <a href="{% url 'inbox' %}" class="dashboard-link">View Inbox</a>
 
-    <table class="classroom-table">
+    <table>
         <thead>
             <tr>
                 <th>To</th>
@@ -93,11 +69,11 @@
             <tr>
                 <td>{{ message.recipient.username }}</td>
                 <td><a href="{% url 'view_message' message.id %}">{{ message.subject }}</a></td>
-                <td>{{ message.timestamp }}</td>
+                <td>{{ message.timestamp|date:"M d, Y H:i" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="3" class="empty-message">No sent messages.</td>
+                <td colspan="3">No sent messages.</td>
             </tr>
             {% endfor %}
         </tbody>

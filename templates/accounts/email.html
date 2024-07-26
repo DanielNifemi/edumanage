@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load allauth i18n %}
+{% load static %}
+
+{% block head_title %}{% trans "Email Addresses" %}{% endblock head_title %}
+
+{% block extra_head %}
+<style>
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: #f1f3f4;
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+    }
+    .google-style-container {
+        max-width: 450px;
+        margin: 40px auto;
+        padding: 40px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .google-style-h1 {
+        font-size: 24px;
+        font-weight: 400;
+        color: #202124;
+        margin-bottom: 20px;
+    }
+    .google-style-p {
+        color: #5f6368;
+        margin-bottom: 20px;
+    }
+    .google-style-email-list {
+        margin-bottom: 30px;
+    }
+    .google-style-email-item {
+        padding: 10px 0;
+        border-bottom: 1px solid #dadce0;
+    }
+    .google-style-email-item:last-child {
+        border-bottom: none;
+    }
+    .google-style-badge {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 10px;
+    }
+    .google-style-badge-success {
+        background-color: #e6f4ea;
+        color: #137333;
+    }
+    .google-style-badge-warning {
+        background-color: #fef7e0;
+        color: #ea8600;
+    }
+    .google-style-badge-primary {
+        background-color: #e8f0fe;
+        color: #1967d2;
+    }
+    .google-style-button {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .google-style-button-secondary {
+        background-color: #fff;
+        color: #1a73e8;
+        border: 1px solid #dadce0;
+    }
+    .google-style-button-danger {
+        background-color: #ea4335;
+        color: white;
+    }
+    .google-style-input-group {
+        margin-bottom: 20px;
+    }
+    .google-style-input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="google-style-container">
+  <h1 class="google-style-h1">{% trans "Email Addresses" %}</h1>
+
+  {% if emailaddresses %}
+    <p class="google-style-p">{% trans 'The following email addresses are associated with your account:' %}</p>
+
+    {% url 'account_email' as email_url %}
+    <form action="{{ email_url }}" method="post" class="google-style-form">
+      {% csrf_token %}
+
+      <div class="google-style-email-list">
+        {% for radio in emailaddress_radios %}
+          {% with emailaddress=radio.emailaddress %}
+            <div class="google-style-email-item">
+              <input type="radio" name="email" value="{{ emailaddress.email }}" id="{{ radio.id }}" {% if radio.checked %}checked{% endif %}>
+              <label for="{{ radio.id }}">
+                {{ emailaddress.email }}
+                {% if emailaddress.verified %}
+                  <span class="google-style-badge google-style-badge-success">{% translate "Verified" %}</span>
+                {% else %}
+                  <span class="google-style-badge google-style-badge-warning">{% translate "Unverified" %}</span>
+                {% endif %}
+                {% if emailaddress.primary %}
+                  <span class="google-style-badge google-style-badge-primary">{% translate "Primary" %}</span>
+                {% endif %}
+              </label>
+            </div>
+          {% endwith %}
+        {% endfor %}
+      </div>
+
+      <div class="google-style-button-group">
+        <button type="submit" name="action_primary" class="google-style-button">{% trans 'Make Primary' %}</button>
+        <button type="submit" name="action_send" class="google-style-button google-style-button-secondary">{% trans 'Re-send Verification' %}</button>
+        <button type="submit" name="action_remove" class="google-style-button google-style-button-danger">{% trans 'Remove' %}</button>
+      </div>
+    </form>
+  {% else %}
+    {% include "account/snippets/warn_no_email.html" %}
+  {% endif %}
+
+  {% if can_add_email %}
+    <h2 class="google-style-h1">{% trans "Add Email Address" %}</h2>
+    <form method="post" action="{% url 'account_email' %}" class="google-style-form">
+      {% csrf_token %}
+      <div class="google-style-input-group">
+        <input type="email" name="{{ form.email.html_name }}" required placeholder="{% trans 'E-mail' %}">
+      </div>
+      <button type="submit" name="action_add" class="google-style-button">{% trans "Add Email" %}</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock content %}
