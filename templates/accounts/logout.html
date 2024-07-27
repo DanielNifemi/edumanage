@@ -97,5 +97,36 @@
         <img src="https://www.google.com/favicon.ico" alt="Google Logo" class="google-logo">
         Log In with Google
     </a>
+    <hr>
+
+    <div class="pe_signin_button" data-client-id="11539081348641370419"></div>
 </div>
+<script src="https://www.phone.email/sign_in_button_v1.js" async></script>
+<script>
+function phoneEmailListener(userObj){
+    var user_json_url = userObj.user_json_url;
+
+    // Send user_json_url to your backend
+    fetch('{% url "phone_verification" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: 'user_json_url=' + encodeURIComponent(user_json_url)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            alert('Verification failed. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
 {% endblock %}

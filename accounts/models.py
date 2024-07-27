@@ -7,6 +7,8 @@ from django.dispatch import receiver
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     is_admin = models.BooleanField(default=False)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    is_phone_verified = models.BooleanField(default=False)
 
     def __str__(self):
         return self.email
