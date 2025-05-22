@@ -2,11 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "/api/index.py",
-      "use": "@vercel/python"
+      "src": "serverless/api.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "5mb"
+      }
     },
     {
-      "src": "/static/**",
+      "src": "static/**",
       "use": "@vercel/static"
     }
   ],
@@ -17,11 +20,12 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/api/index.py"
+      "dest": "serverless/api.py"
     }
   ],
   "env": {
+    "PYTHONPATH": ".",
     "DJANGO_SETTINGS_MODULE": "edumanage.settings",
-    "PYTHONPATH": "."
+    "DEBUG": "False"
   }
 }
