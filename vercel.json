@@ -13,7 +13,9 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.9"
+        "runtime": "python3.9",
+        "memory": 512,
+        "maxDuration": 10
       }
     }
   ],
@@ -37,12 +39,6 @@
       "dest": "edumanage/wsgi.py"
     }
   ],
-  "functions": {
-    "edumanage/wsgi.py": {
-      "memory": 512,
-      "maxDuration": 10
-    }
-  },
   "env": {
     "DJANGO_SETTINGS_MODULE": "edumanage.settings",
     "PYTHONPATH": ".",
