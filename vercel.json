@@ -1,21 +1,14 @@
 {
   "version": 2,
+  "buildCommand": "sh ./build_files.sh",
+  "outputDirectory": "staticfiles_build",
   "builds": [
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles_build"
-      }
-    },
     {
       "src": "edumanage/wsgi.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "15mb",
         "runtime": "python3.9",
-        "memory": 512,
-        "maxDuration": 10
+        "maxLambdaSize": "10mb"
       }
     }
   ],
@@ -23,13 +16,6 @@
     {
       "src": "/static/(.*)",
       "dest": "/static/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
-      "src": "/media/(.*)",
-      "dest": "/media/$1",
       "headers": {
         "cache-control": "public, max-age=31536000, immutable"
       }

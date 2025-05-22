@@ -1,16 +1,26 @@
+#!/bin/bash
+
 echo "Installing dependencies..."
-pip install --no-cache-dir -r requirements-prod.txt
+python3.9 -m pip install --no-cache-dir -r requirements-prod.txt
 
-echo "Removing development files..."
-rm -rf __pycache__
-rm -rf *.pyc
-rm -f db.sqlite3
-rm -f db.sqlite3.backup
+echo "Cleaning up Python cache..."
+find . -type d -name "__pycache__" -exec rm -rf {} +
+find . -type f -name "*.pyc" -delete
+find . -type f -name "*.pyo" -delete
+find . -type f -name "*.pyd" -delete
+rm -f db.sqlite3 db.sqlite3.backup
 
-echo "Creating static files directory..."
+echo "Setting up static files..."
 mkdir -p staticfiles_build/static
 
 echo "Collecting static files..."
-python -m manage.py collectstatic --noinput
+python3.9 manage.py collectstatic --noinput
+
+echo "Optimizing deployment size..."
+rm -rf tests/
+rm -rf docs/
+rm -rf .git/
+rm -rf node_modules/
+rm -rf media/
 
 echo "Build completed!"
