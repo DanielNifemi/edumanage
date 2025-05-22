@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .classroom-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .classroom-header {
+            color: #1a73e8;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .classroom-button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .classroom-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+        .classroom-table th, .classroom-table td {
+            border: 1px solid #dadce0;
+            padding: 12px;
+            text-align: left;
+        }
+        .classroom-table th {
+            background-color: #f1f3f4;
+            font-weight: 500;
+        }
+        .classroom-empty {
+            color: #5f6368;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<div class="classroom-container">
+    <h1 id="my-lessons" class="classroom-header">My Lessons</h1>
+
+    <a href="{% url 'add_lesson' %}" class="classroom-button">Add New Lesson</a>
+
+    <table class="classroom-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Class</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Topic</th>
+                <th>YouTube Link</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lesson in lessons %}
+            <tr>
+                <td>{{ lesson.date }}</td>
+                <td>{{ lesson.subject.name }}</td>
+                <td>{{ lesson.class_group.name }}</td>
+                <td>{{ lesson.start_time }}</td>
+                <td>{{ lesson.end_time }}</td>
+                <td>{{ lesson.topic }}</td>
+                <td>
+                    {% if lesson.youtube_link %}
+                    <a href="{{ lesson.youtube_link }}" target="_blank" class="classroom-link">View</a>
+                    {% else %}
+                    No link
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'edit_lesson' lesson.id %}" class="classroom-button">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">No lessons scheduled yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

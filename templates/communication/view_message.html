@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<style>
+    .classroom-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .classroom-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+    .classroom-title {
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .message-body {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        line-height: 1.6;
+    }
+    .message-actions {
+        margin-top: 20px;
+    }
+    .classroom-button {
+        display: inline-block;
+        margin-right: 10px;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .delete-button {
+        background-color: #dc3545;
+    }
+    .attachment-link {
+        color: #28a745;
+        text-decoration: none;
+    }
+    .reply-list {
+        margin-top: 20px;
+        padding-left: 20px;
+    }
+    .reply-list li {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 class="classroom-title">{{ message.subject }}</h2>
+        <p><strong>From:</strong> {{ message.sender }}</p>
+        <p><strong>To:</strong> {{ message.recipient }}</p>
+        <p><strong>Date:</strong> {{ message.timestamp }}</p>
+        {% if message.attachment %}
+        <p><strong>Attachment:</strong> <a href="{{ message.attachment.url }}" class="attachment-link">Download</a></p>
+        {% endif %}
+        <div class="message-body">
+            {{ message.body|safe }}
+        </div>
+        <hr>
+        <div class="message-actions">
+            <a href="{% url 'reply_message' message.id %}" class="classroom-button">Reply</a>
+            <a href="{% url 'forward_message' message.id %}" class="classroom-button">Forward</a>
+            <a href="{% url 'delete_message' message.id %}" class="classroom-button delete-button">Delete</a>
+        </div>
+        {% if message.replies.all %}
+        <h3>Replies:</h3>
+        <ul class="reply-list">
+            {% for reply in message.replies.all %}
+            <li>
+                <a href="{% url 'view_message' reply.id %}">{{ reply.subject }}</a> - {{ reply.sender }} ({{ reply.timestamp }})
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}}

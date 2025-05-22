@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'course_list' %}">Courses</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'course_detail' assignment.content.course.pk %}">{{ assignment.content.course.course_code }}</a></li>
+                    <li class="breadcrumb-item active">{{ assignment.content.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{{ assignment.content.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Assignment Details</h5>
+                        <p>{{ assignment.content.description }}</p>
+                        
+                        {% if assignment.content.file %}
+                        <p>
+                            <a href="{{ assignment.content.file.url }}" class="btn btn-outline-primary" target="_blank">
+                                Download Assignment File
+                            </a>
+                        </p>
+                        {% endif %}
+                        
+                        <div class="alert alert-info">
+                            <strong>Points:</strong> {{ assignment.total_points }}<br>
+                            <strong>Due Date:</strong> {{ assignment.content.due_date|date:"F j, Y, g:i a" }}<br>
+                            <strong>Submission Type:</strong> {{ assignment.submission_type|title }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Student Submissions</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for submission in submissions %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">{{ submission.student.user.get_full_name }}</h6>
+                            <small>Submitted: {{ submission.submitted_at|date:"F j, Y, g:i a" }}</small>
+                        </div>
+                        
+                        {% if submission.submitted_file %}
+                            <p class="mb-2">
+                                <strong>Submitted File:</strong>
+                                <a href="{{ submission.submitted_file.url }}" target="_blank">View Submission</a>
+                            </p>
+                        {% endif %}
+                        
+                        {% if submission.submitted_text %}
+                            <p class="mb-2"><strong>Submitted Text:</strong></p>
+                            <pre class="bg-light p-2 rounded">{{ submission.submitted_text }}</pre>
+                        {% endif %}
+                        
+                        {% if submission.submitted_url %}
+                            <p class="mb-2">
+                                <strong>Submitted URL:</strong>
+                                <a href="{{ submission.submitted_url }}" target="_blank">
+                                    {{ submission.submitted_url }}
+                                </a>
+                            </p>
+                        {% endif %}
+                        
+                        {% if submission.grade %}
+                            <div class="alert alert-success mb-2">
+                                <strong>Grade:</strong> {{ submission.grade }}/{{ assignment.total_points }}
+                                {% if submission.feedback %}
+                                    <hr>
+                                    <strong>Feedback:</strong><br>
+                                    {{ submission.feedback }}
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'grade_assignment' submission.pk %}" class="mt-3">
+                                {% csrf_token %}
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-auto">
+                                        <label for="grade_{{ submission.pk }}" class="col-form-label">Grade:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="grade_{{ submission.pk }}" name="grade" 
+                                               class="form-control" min="0" max="{{ assignment.total_points }}" 
+                                               step="0.1" required>
+                                    </div>
+                                    <div class="col-auto">
+                                        <span class="form-text">/ {{ assignment.total_points }}</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3 mt-2">
+                                    <label for="feedback_{{ submission.pk }}" class="form-label">Feedback:</label>
+                                    <textarea id="feedback_{{ submission.pk }}" name="feedback" 
+                                              class="form-control" rows="3"></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Grade</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item text-center text-muted">
+                        No submissions yet.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Submission Stats</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Total Students:</strong> {{ total_students }}</p>
+                    <p><strong>Submissions:</strong> {{ submissions|length }}</p>
+                    <p><strong>Missing:</strong> {{ total_students|subtract:submissions|length }}</p>
+                    <p><strong>Graded:</strong> {{ graded_count }}</p>
+                    <p><strong>Average Grade:</strong> {{ average_grade|default:"N/A" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

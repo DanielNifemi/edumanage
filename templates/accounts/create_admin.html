@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .admin-create-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .admin-create-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #3c4043;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .create-btn {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .create-btn:hover {
+        background-color: #1967d2;
+    }
+    .help-text {
+        font-size: 14px;
+        color: #5f6368;
+        margin-top: 0.25rem;
+    }
+    .error-text {
+        color: #d93025;
+        font-size: 14px;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="admin-create-container">
+    <h2 class="admin-create-title">Create Admin User</h2>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text|safe }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="error-text">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="create-btn">Create Admin</button>
+    </form>
+</div>
+{% endblock %}

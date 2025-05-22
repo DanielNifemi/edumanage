@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<style>
+    .classroom-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .welcome-section {
+        margin-bottom: 20px;
+    }
+    .welcome-title {
+        color: #333;
+        display: inline-block;
+        margin-right: 10px;
+    }
+    .role-tag {
+        background-color: #28a745;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.8em;
+    }
+    .dashboard-link {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 20px;
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    .classroom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .classroom-table th, .classroom-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    .classroom-table th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .action-link {
+        margin-right: 5px;
+        color: #007bff;
+        text-decoration: none;
+    }
+</style>
+<div class="classroom-container">
+    <div class="welcome-section">
+        <h2 id="sent-messages" class="welcome-title">Sent Messages</h2>
+        <span class="role-tag">Outbox</span>
+    </div>
+
+    <a href="{% url 'compose_message' %}" class="dashboard-link">Compose New Message</a>
+    <a href="{% url 'inbox' %}" class="dashboard-link">View Inbox</a>
+
+    <table class="classroom-table">
+        <thead>
+            <tr>
+                <th>To</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in messages %}
+            <tr>
+                <td>{{ message.recipient.username }}</td>
+                <td><a href="{% url 'view_message' message.id %}">{{ message.subject }}</a></td>
+                <td>{{ message.timestamp|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'delete_message' message.id %}" class="action-link">Delete</a>
+                    <a href="{% url 'forward_message' message.id %}" class="action-link">Forward</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No sent messages.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

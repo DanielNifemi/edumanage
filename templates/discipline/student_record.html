@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .classroom-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .welcome-section {
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .welcome-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .section-title {
+        color: #3c4043;
+        font-size: 20px;
+        margin: 30px 0 15px;
+    }
+    .classroom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    .classroom-table th,
+    .classroom-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .classroom-table th {
+        background-color: #f1f3f4;
+        font-weight: bold;
+        color: #3c4043;
+    }
+    .classroom-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    .empty-message {
+        text-align: center;
+        color: #5f6368;
+        padding: 20px;
+    }
+    .classroom-button {
+        display: inline-block;
+        background-color: #1a73e8;
+        color: white;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+    .behavior-notes {
+        list-style-type: none;
+        padding: 0;
+    }
+    .behavior-note {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .note-date {
+        color: #1967d2;
+        font-weight: bold;
+    }
+    .note-content {
+        margin: 10px 0;
+    }
+    .note-author {
+        color: #5f6368;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="classroom-container">
+    <div class="welcome-section">
+        <h2 class="welcome-title">Discipline Record for {{ student.full_name }}</h2>
+    </div>
+
+    <h3 class="section-title">Disciplinary Records</h3>
+    <table class="classroom-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Infraction</th>
+                <th>Action Taken</th>
+                <th>Resolved</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.date }}</td>
+                <td>{{ record.infraction_type }}</td>
+                <td>{{ record.action_taken|default_if_none:"N/A" }}</td>
+                <td>{% if record.resolved %}Yes{% else %}No{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-message">No disciplinary records found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'add_disciplinary_record' student.id %}" class="classroom-button">Add Disciplinary Record</a>
+
+    <h3 class="section-title">Behavior Notes</h3>
+    <ul class="behavior-notes">
+        {% for note in notes %}
+        <li class="behavior-note">
+            <div class="note-date">{{ note.date }}</div>
+            <div class="note-content">{{ note.note }}</div>
+            <div class="note-author">Noted by: {{ note.noted_by }}</div>
+        </li>
+        {% empty %}
+        <li class="empty-message">No behavior notes found.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'add_behavior_note' student.id %}" class="classroom-button">Add Behavior Note</a>
+</div>
+{% endblock %}

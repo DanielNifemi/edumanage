@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Create Exam</h1>
+    <form method="post" class="form-group">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Exam Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="date">Exam Date:</label>
+            <input type="date" id="date" name="date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" id="subject" name="subject" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="students">Students:</label>
+            <select id="students" name="students" class="form-control" multiple required>
+                {% for student in students %}
+                <option value="{{ student.id }}">{{ student }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Create Exam</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .profile-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+    .profile-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #3c4043;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+    .submit-btn {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .submit-btn:hover {
+        background-color: #1967d2;
+    }
+    .divider {
+        border-top: 1px solid #dadce0;
+        margin: 2rem 0;
+    }
+    .section-title {
+        color: #3c4043;
+        font-size: 18px;
+        margin-bottom: 1rem;
+    }
+    .alert {
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+    }
+    .alert-success {
+        background-color: #e6f4ea;
+        color: #1e8e3e;
+        border: 1px solid #d2e3d5;
+    }
+    .alert-error {
+        background-color: #fce8e6;
+        color: #d93025;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="profile-container">
+    <h2 class="profile-title">Complete Your Profile</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <!-- User Type Selection Form -->
+    <form method="post" id="typeForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ type_form.user_type.id_for_label }}">Select User Type:</label>
+            {{ type_form.user_type }}
+        </div>
+    </form>
+
+    <div class="divider"></div>
+
+    <!-- Profile Details Form -->
+    <div class="section-title">{{ profile_type|title }} Details</div>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: #5f6368;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p class="alert alert-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="submit-btn">Save Profile</button>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    // Auto-submit type form when selection changes
+    document.getElementById('{{ type_form.user_type.id_for_label }}').addEventListener('change', function() {
+        document.getElementById('typeForm').submit();
+    });
+</script>
+{% endblock %}
+{% endblock %}

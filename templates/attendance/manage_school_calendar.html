@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<h2>Manage School Calendar</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Event</button>
+</form>
+
+<h3>Upcoming Events</h3>
+<ul>
+    {% for event in events %}
+    <li>{{ event.date }} - {% if event.is_holiday %}Holiday{% else %}School Day{% endif %} {% if event.event_name %}- {{ event.event_name }}{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

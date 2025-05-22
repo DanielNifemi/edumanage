@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Notifications</h2>
+<ul>
+    {% for notification in notifications %}
+    <li>
+        <a href="{% url 'view_message' notification.message.id %}">
+            New message from {{ notification.message.sender }}: {{ notification.message.subject }}
+        </a>
+        ({{ notification.timestamp }})
+    </li>
+    {% empty %}
+    <li>No new notifications.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

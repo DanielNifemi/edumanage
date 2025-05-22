@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<style>
+    .classroom-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f1f3f4;
+    }
+    .classroom-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+    .classroom-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .classroom-message {
+        color: #3c4043;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    .classroom-button {
+        display: inline-block;
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+    .classroom-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .classroom-table th,
+    .classroom-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .classroom-table th {
+        background-color: #f1f3f4;
+        font-weight: bold;
+        color: #3c4043;
+    }
+</style>
+{% endblock %}
+{% block main_content %}
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 class="classroom-title">Attendance List</h2>
+        <table class="classroom-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attendance in attendances %}
+                <tr>
+                    <td>{{ attendance.student.username }}</td>
+                    <td>{{ attendance.date }}</td>
+                    <td>{{ attendance.is_present|yesno:"Present,Absent" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

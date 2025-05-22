@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+<div class="container mt-4">
+    <div class="welcome-section bg-primary text-white p-4 rounded mb-4">
+        <h2>Welcome, {{ user.get_full_name|default:user.email }}</h2>
+        <p>Current Role: <span class="badge bg-light text-primary">{{ user_type|title }}</span></p>
+    </div>
+    .welcome-title {
+        font-size: 24px;
+        margin-bottom: 0.5rem;
+    }
+    .role-tag {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 16px;
+        font-size: 14px;
+    }
+    .dashboard-section {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .section-title {
+        color: #3c4043;
+        font-size: 18px;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #dadce0;
+        padding-bottom: 0.5rem;
+    }
+    .dashboard-link {
+        display: block;
+        color: #1967d2;
+        text-decoration: none;
+        padding: 0.5rem 0;
+        transition: all 0.3s ease;
+    }
+    .dashboard-link:hover {
+        background-color: #f1f3f4;
+        border-radius: 4px;
+        text-decoration: none;
+        padding-left: 0.5rem;
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    .course-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .course-item:hover {
+        background-color: #f8f9fa;
+        border-color: #4285F4;
+        transform: translateX(5px);
+    }
+    .course-title {
+        color: #4285F4;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    .course-title:hover {
+        text-decoration: none;
+        color: #1967d2;
+    }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="welcome-section bg-primary text-white p-4 rounded mb-4">
+        <h2>Welcome, {{ user.get_full_name|default:user.email }}</h2>
+        <p>Current Role: <span class="badge bg-light text-primary">{{ user_type|title }}</span></p>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Courses</h5>
+                </div>
+                <div class="card-body">
+                    {% if user_type == 'teacher' %}
+                        {% for course in user.teacher.courses_taught.all|slice:":5" %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <a href="{% url 'course_detail' course.pk %}" class="text-decoration-none">
+                                    {{ course.course_code }}: {{ course.name }}
+                                </a>
+                                <span class="badge bg-primary">{{ course.students.count }} Students</span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">You haven't created any courses yet.</p>
+                        {% endfor %}
+                        <div class="mt-3">
+                            <a href="{% url 'course_create' %}" class="btn btn-primary">Create Course</a>
+                            <a href="{% url 'course_list' %}" class="btn btn-outline-primary">View All Courses</a>
+                        </div>
+                    {% else %}
+                        {% for enrollment in user.student.courseenrollment_set.filter.all|slice:":5" %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <a href="{% url 'course_detail' enrollment.course.pk %}" class="text-decoration-none">
+                                    {{ enrollment.course.course_code }}: {{ enrollment.course.name }}
+                                </a>
+                                <span class="badge {% if enrollment.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {{ enrollment.is_active|yesno:"Active,Inactive" }}
+                                </span>
+                            </div>
+                        {% empty %}
+                            <p class="text-muted">You're not enrolled in any courses yet.</p>
+                        {% endfor %}
+                        <div class="mt-3">
+                            <a href="{% url 'course_list' %}" class="btn btn-primary">View All Courses</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if is_superuser %}
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Superuser Access Panel</h4>
+        </div>
+        <div class="card-body">
+            <h5>Available Roles</h5>
+            <div class="mb-4">
+                {% for role in available_roles %}
+                <a href="{% url 'switch_role' role %}" 
+                   class="btn {% if role == user_type %}btn-primary{% else %}btn-outline-primary{% endif %} me-2 mb-2">
+                    {{ role|title }}
+                </a>
+                {% endfor %}
+            </div>
+
+            <h5>Your Profiles</h5>
+            <div class="row">
+                {% if student_profile %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Student Profile
+                            <a href="{% url 'edit_profile' 'student' %}" class="btn btn-sm btn-primary float-end">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <p>ID: {{ student_profile.student_id }}</p>
+                            <p>Grade: {{ student_profile.grade }}</p>
+                            <a href="{% url 'student_detail' student_profile.pk %}" class="btn btn-sm btn-info">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if teacher_profile %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Teacher Profile
+                            <a href="{% url 'edit_profile' 'teacher' %}" class="btn btn-sm btn-primary float-end">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <p>Subjects: {{ teacher_profile.subjects }}</p>
+                            <p>Experience: {{ teacher_profile.years_of_experience }} years</p>
+                            <a href="#" class="btn btn-sm btn-info">View Classes</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if staff_profile %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            Staff Profile
+                            <a href="{% url 'edit_profile' 'staff' %}" class="btn btn-sm btn-primary float-end">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <p>ID: {{ staff_profile.staff_id }}</p>
+                            <p>Department: {{ staff_profile.department }}</p>
+                            <p>Position: {{ staff_profile.position }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if user_type == 'student' %}
+        <div class="dashboard-section">
+            <h3 class="section-title">Student Dashboard</h3>
+            <a href="{% url 'view_grades' %}" class="dashboard-link">View Grades</a>
+            {% if student_profile %}
+            <a href="{% url 'edit_profile' 'student' %}" class="dashboard-link">Edit Profile</a>
+            {% endif %}
+        </div>
+    {% elif user_type == 'teacher' %}
+        <div class="dashboard-section">
+            <h3 class="section-title">Teacher Dashboard</h3>
+            {% if teacher_profile %}
+            <a href="{% url 'edit_profile' 'teacher' %}" class="dashboard-link">Edit Profile</a>
+            {% endif %}
+            <a href="{% url 'grade_assignments' %}" class="dashboard-link">Grade Assignments</a>
+        </div>
+    {% elif user_type == 'staff' %}
+        <div class="dashboard-section">
+            <h3 class="section-title">Staff Dashboard</h3>
+            {% if staff_profile %}
+            <a href="{% url 'edit_profile' 'staff' %}" class="dashboard-link">Edit Profile</a>
+            {% endif %}
+            <a href="{% url 'manage_records' %}" class="dashboard-link">Manage Records</a>
+        </div>
+    {% elif user_type == 'admin' %}
+        <div class="dashboard-section">
+            <h3 class="section-title">Admin Dashboard</h3>
+            <a href="{% url 'admin:index' %}" class="dashboard-link">Admin Panel</a>
+            <a href="{% url 'create_admin' %}" class="dashboard-link">Create Admin User</a>
+            <a href="{% url 'student_list' %}" class="dashboard-link">Manage Students</a>
+            <a href="{% url 'staff_list' %}" class="dashboard-link">Manage Staff</a>
+            <a href="{% url 'discipline_dashboard' %}" class="dashboard-link">Discipline Dashboard</a>
+            <a href="{% url 'attendance_report' %}" class="dashboard-link">Attendance Report</a>
+            <a href="{% url 'event_list' %}" class="dashboard-link">School Events</a>
+        </div>
+    {% endif %}
+
+    <div class="dashboard-section">
+        <h3 class="section-title">Common Features</h3>
+            <a href="{% url 'complete_profile' %}" class="dashboard-link" id="complete-profile-link">Complete Profile</a>
+        </div>
+        <!-- Debug info -->
+        <div class="d-none">
+            <p>Debug URL: {% url 'complete_profile' %}</p>
+        </div>
+    </div>
+</div>
+{% block extra_js %}
+<script>
+document.getElementById('complete-profile-link').addEventListener('click', function(e) {
+    console.log('Link clicked');
+    console.log('Link href:', this.href);
+});
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduManage</title>
+    <style>
+        /* Tailwind CSS Base */
+        :root {
+            --background: 0 0% 100%;
+            --foreground: 240 10% 3.9%;
+            --card: 0 0% 100%;
+            --card-foreground: 240 10% 3.9%;
+            --popover: 0 0% 100%;
+            --popover-foreground: 240 10% 3.9%;
+            --primary: 240 5.9% 10%;
+            --primary-foreground: 0 0% 98%;
+            --secondary: 240 4.8% 95.9%;
+            --secondary-foreground: 240 5.9% 10%;
+            --muted: 240 4.8% 95.9%;
+            --muted-foreground: 240 3.8% 45%;
+            --accent: 240 4.8% 95.9%;
+            --accent-foreground: 240 5.9% 10%;
+            --destructive: 0 72% 51%;
+            --destructive-foreground: 0 0% 98%;
+            --border: 240 5.9% 90%;
+            --input: 240 5.9% 90%;
+            --ring: 240 5.9% 10%;
+            --radius: 0.5rem;
+        }
+
+        * {
+            border-color: hsl(var(--border));
+        }
+
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: Arial, sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Helvetica Neue', sans-serif;
+        }
+
+        /* Component-specific styles */
+        .header, .footer {
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            padding: 1rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: hsl(var(--card));
+            color: hsl(var(--card-foreground));
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header, .card-footer {
+            margin-bottom: 1rem;
+        }
+
+        .card-footer {
+            text-align: right;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            background-color: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            text-decoration: none;
+        }
+
+        .button:hover {
+            background-color: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+        }
+
+        .input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid hsl(var(--input));
+            border-radius: var(--radius);
+            margin-top: 0.5rem;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-6 {
+            gap: 1.5rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .md\\:flex {
+            display: flex;
+        }
+
+        .ml-auto {
+            margin-left: auto;
+        }
+
+        .mt-auto {
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <header class="header flex items-center justify-between">
+        <div class="container flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6">
+                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>
+                </svg>
+                <span class="text-xl font-bold">EduManage</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="#" class="hover:underline">Courses</a>
+                <a href="#" class="hover:underline">Exams</a>
+                <a href="#" class="hover:underline">Grades</a>
+                <a href="#" class="hover:underline">Profile</a>
+            </nav>
+            <a href="#" class="button">Logout</a>
+        </div>
+    </header>
+
+    <main class="flex-1 py-8 px-4">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Final Exam - Biology 101</h2>
+                    <p class="card-description">
+                        <div>Duration: 60 minutes</div>
+                        <div>Instructions: Answer all questions to the best of your ability.</div>
+                    </p>
+                </div>
+                <div class="card-content">
+                    <form class="grid gap-6">
+                        <div class="grid gap-2">
+                            <label for="question-1">Question 1</label>
+                            <input id="question-1" type="text" placeholder="Enter your answer" class="input">
+                        </div>
+                        <div class="grid gap-2">
+                            <label for="question-2">Question 2</label>
+                            <input id="question-2" type="text" placeholder="Enter your answer" class="input">
+                        </div>
+                        <div class="grid gap-2">
+                            <label for="question-3">Question 3</label>
+                            <input id="question-3" type="text" placeholder="Enter your answer" class="input">
+                        </div>
+                        <div class="grid gap-2">
+                            <label for="question-4">Question 4</label>
+                            <input id="question-4" type="text" placeholder="Enter your answer" class="input">
+                        </div>
+                        <div class="grid gap-2">
+                            <label for="question-5">Question 5</label>
+                            <input id="question-5" type="text" placeholder="Enter your answer" class="input">
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <a href="#" class="button">Submit Exam</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer mt-auto">
+        <div class="container flex items-center justify-between">
+            <p class="text-sm">&copy; 2024 EduManage. All rights reserved.</p>
+            <nav class="flex items-center gap-4">
+                <a href="#" class="hover:underline">Privacy Policy</a>
+                <a href="#" class="hover:underline">Terms of Service</a>
+                <a href="#" class="hover:underline">Contact Us</a>
+            </nav>
+        </div>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .auth-container {
+        width: 100%;
+        max-width: 308px;
+        margin: 40px auto;
+        font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji";
+    }
+    .auth-header {
+        text-align: center;
+        margin-bottom: 24px;
+    }
+    .auth-logo {
+        margin-bottom: 24px;
+        color: #1f2328;
+        font-size: 24px;
+        font-weight: 300;
+    }
+    .auth-form-box {
+        padding: 16px;
+        background-color: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        margin-bottom: 16px;
+    }
+    .auth-form-header {
+        margin-bottom: 16px;
+        color: #1f2328;
+        font-size: 14px;
+        font-weight: 400;
+    }
+    .auth-form-group {
+        margin-bottom: 16px;
+    }
+    .auth-form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 400;
+        font-size: 14px;
+        color: #1f2328;
+    }
+    .auth-form-control {
+        width: 100%;
+        padding: 5px 12px;
+        font-size: 14px;
+        line-height: 20px;
+        color: #1f2328;
+        vertical-align: middle;
+        background-color: #ffffff;
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        outline: none;
+        box-shadow: inset 0 1px 0 rgba(208,215,222,0.2);
+    }
+    .auth-form-control:focus {
+        border-color: #0969da;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(9,105,218,0.3);
+    }
+    .auth-button {
+        display: inline-block;
+        padding: 5px 16px;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 20px;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        user-select: none;
+        border: 1px solid;
+        border-radius: 6px;
+        appearance: none;
+        text-decoration: none;
+        width: 100%;
+    }
+    .auth-button-primary {
+        color: #ffffff;
+        background-color: #1f883d;
+        border-color: rgba(27,31,36,0.15);
+    }
+    .auth-button-primary:hover {
+        background-color: #1a7f37;
+    }
+    .auth-social-button {
+        color: #24292f;
+        background-color: #ffffff;
+        border: 1px solid #d0d7de;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .auth-social-button:hover {
+        background-color: #f3f4f6;
+        text-decoration: none;
+    }
+    .auth-social-button img {
+        margin-right: 8px;
+        width: 18px;
+        height: 18px;
+    }
+    .signin-callout {
+        padding: 16px;
+        text-align: center;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+    }
+    .terms-text {
+        font-size: 12px;
+        color: #57606a;
+        margin-top: 16px;
+    }
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+    .classroom-text {
+        font-size: 14px;
+        color: #5f6368;
+    }
+    .classroom-link {
+        color: #1a73e8;
+        text-decoration: none;
+    }
+    .classroom-divider {
+        border-top: 1px solid #e0e0e0;
+        margin: 20px 0;
+    }
+    .classroom-google-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: #3c4043;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
+    .classroom-google-button:hover {
+        background-color: #f8f9fa;
+    }
+    .google-icon {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+    }
+</style>
+{% endblock %}
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-header">
+        <h1 class="auth-logo">EduManage</h1>
+    </div>
+
+    <div class="auth-form-box">
+        <h2 class="auth-form-header">Create your account</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="auth-form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% with classes="auth-form-control"|add:field.css_classes %}
+                {{ field|addclass:classes }}
+                {% endwith %}
+                {% if field.errors %}
+                <div class="alert alert-danger">
+                    {{ field.errors }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="auth-button auth-button-primary">Create account</button>
+
+            {% get_providers as socialaccount_providers %}
+            {% if socialaccount_providers %}
+                {% for provider in socialaccount_providers %}
+                    {% if provider.id == "google" %}
+                    <a href="{% provider_login_url 'google' %}" class="auth-button auth-social-button">
+                        <img src="{% static 'img/google-logo.png' %}" alt="Google">
+                        Sign up with Google
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <p class="terms-text">
+                By creating an account, you agree to EduManage's terms of service and privacy statement.
+            </p>
+        </form>
+    </div>
+
+    <div class="signin-callout">
+        Already have an account? 
+        <a href="{% url 'account_login' %}">Sign in</a>.
+    </div>
+</div>{% endblock %}
+<script src="https://www.phone.email/sign_in_button_v1.js" async></script>
+<script>
+function phoneEmailListener(userObj){
+    var user_json_url = userObj.user_json_url;
+
+    // Send user_json_url to your backend
+    fetch('{% url "phone_verification" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: 'user_json_url=' + encodeURIComponent(user_json_url)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect;
+        } else {
+            alert('Verification failed. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+}
+</script>
+{% endblock %}

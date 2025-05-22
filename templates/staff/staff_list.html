@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block main_content %}
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+        .classroom-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .classroom-header {
+            color: #1a73e8;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .classroom-card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .classroom-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            padding: 20px;
+            width: calc(33.333% - 20px);
+        }
+        .classroom-card-title {
+            color: #1a73e8;
+            font-size: 18px;
+            margin-top: 0;
+        }
+        .classroom-button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .classroom-empty {
+            color: #5f6368;
+            font-style: italic;
+        }
+    </style>
+</head>
+<div class="classroom-container">
+    <h1 class="classroom-header">Staff List</h1>
+    <div class="classroom-card-container">
+        {% for staff in staff_list %}
+            <div class="classroom-card">
+                <h2 class="classroom-card-title">{{ staff.user.get_full_name }}</h2>
+                <p><strong>Employee ID:</strong> {{ staff.employee_id }}</p>
+                <p><strong>Department:</strong> {{ staff.department }}</p>
+                <p><strong>Role:</strong> {{ staff.role }}</p>
+                <a href="{% url 'performance_evaluation' staff.id %}" class="classroom-button">Evaluate</a>
+            </div>
+        {% empty %}
+            <p class="classroom-empty">No staff members found.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

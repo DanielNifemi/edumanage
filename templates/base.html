@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduManage</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #f6f8fa;
+        }
+        .no-nav-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #wrapper {
+            display: flex;
+            flex: 1;
+        }
+        #sidebar-wrapper {
+            min-height: 100vh;
+            margin-left: -15rem;
+            transition: margin .25s ease-out;
+        }
+        #sidebar-wrapper .sidebar-heading {
+            padding: 0.875rem 1.25rem;
+            font-size: 1.2rem;
+        }
+        #sidebar-wrapper .list-group {
+            width: 15rem;
+        }
+        #page-content-wrapper {
+            min-width: 100vw;
+        }
+        body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+            margin-left: 0;
+        }
+        @media (min-width: 768px) {
+            #sidebar-wrapper {
+                margin-left: 0;
+            }
+            #page-content-wrapper {
+                min-width: 0;
+                width: 100%;
+            }
+            body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
+                margin-left: -15rem;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% block content %}
+    {% if request.resolver_match.url_name == 'account_login' or request.resolver_match.url_name == 'account_signup' %}
+    <div class="no-nav-wrapper">
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% else %}
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">Account Management </div>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'account_email' %}" class="list-group-item list-group-item-action bg-light">Manage Email</a>
+                <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action bg-light">Change Password</a>
+                <a href="{% url 'account_logout' %}" class="list-group-item list-group-item-action bg-light">Logout</a>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <button class="btn btn-primary" id="menu-toggle"><i class="fas fa-bars"></i></button>
+                <a class="navbar-brand ml-3" href="{% url 'home' %}">EduManage</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'course_list' %}">Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notifications' %}">Notifications</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'dashboard' %}"><i class="fas fa-bars"></i></a>
+                        </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                {% block main_content %}{% endblock %}
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    {% endif %}
+    {% endblock content %}
+    <!-- /#wrapper -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("body").toggleClass("sb-sidenav-toggled");
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

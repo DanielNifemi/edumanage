@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .classroom-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .welcome-section {
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .welcome-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .student-name {
+        font-weight: bold;
+        color: #3c4043;
+    }
+    .classroom-form {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .classroom-form label {
+        display: block;
+        margin-bottom: 5px;
+        color: #3c4043;
+        font-weight: bold;
+    }
+    .classroom-form input[type="text"],
+    .classroom-form input[type="date"],
+    .classroom-form select,
+    .classroom-form textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #dadce0;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    .classroom-form textarea {
+        height: 100px;
+    }
+    .classroom-button {
+        background-color: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="classroom-container">
+    <div class="welcome-section">
+        <h2 class="welcome-title">Add Disciplinary Record</h2>
+        <p>for <span class="student-name">{{ student.full_name }}</span></p>
+    </div>
+
+    <form method="post" class="classroom-form">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error-message">{{ field.errors }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="classroom-button">Add Record</button>
+    </form>
+</div>
+{% endblock %}

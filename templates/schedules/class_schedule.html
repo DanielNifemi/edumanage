@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<style>
+    .classroom-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .welcome-section {
+        background-color: #f1f3f4;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .welcome-title {
+        color: #1967d2;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .classroom-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    .classroom-table th,
+    .classroom-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .classroom-table th {
+        background-color: #f1f3f4;
+        font-weight: bold;
+        color: #3c4043;
+    }
+    .classroom-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    .empty-message {
+        text-align: center;
+        color: #5f6368;
+        padding: 20px;
+    }
+    .classroom-button {
+        display: inline-block;
+        background-color: #1a73e8;
+        color: white;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    .classroom-button:hover {
+        background-color: #1967d2;
+    }
+</style>
+{% endblock %}
+
+{% block main_content %}
+<div class="classroom-container">
+    <div class="welcome-section">
+        <h2 class="welcome-title">Class Schedule for {{ class_group.name }}</h2>
+    </div>
+
+    <table class="classroom-table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for schedule in schedules %}
+            <tr>
+                <td>{{ schedule.day }}</td>
+                <td>{{ schedule.time_slot }}</td>
+                <td>{{ schedule.subject }}</td>
+                <td>{{ schedule.teacher }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-message">No schedules available for this class.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'add_schedule' %}" class="classroom-button">Add Schedule</a>
+</div>
+{% endblock %}

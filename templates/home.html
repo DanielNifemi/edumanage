@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block main_content %}
+
+<style>
+    .edu-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .edu-header {
+        background-color: #4285F4;
+        color: white;
+        padding: 40px 0;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .edu-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    .edu-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    .edu-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: transform 0.3s ease;
+    }
+    .edu-card:hover {
+        transform: translateY(-5px);
+    }
+    .edu-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 30px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .edu-btn-primary {
+        background-color: #4285F4;
+        color: white;
+        border: none;
+    }
+    .edu-btn-primary:hover {
+        background-color: #3367D6;
+    }
+    .edu-btn-secondary {
+        background-color: #34A853;
+        color: white;
+        border: none;
+    }
+    .edu-btn-secondary:hover {
+        background-color: #2E8B57;
+    }
+</style>
+
+<div class="edu-container">
+    <header class="edu-header text-center">
+        <h1>Welcome to EduManage</h1>
+        <p>Your all-in-one solution for seamless classroom management and learning</p>
+    </header>
+
+    {% if user.is_authenticated %}
+    <div class="edu-card text-center">
+        <h2>Welcome back, {{ user.email }}!</h2>
+        <p>Ready to continue your learning journey? Access your courses, assignments, and resources from your personalized dashboard.</p>
+        <a href="{% url 'dashboard' %}" class="edu-btn edu-btn-primary mr-3">Go to Dashboard</a>
+        <a href="{% url 'account_logout' %}" class="edu-btn edu-btn-secondary">Logout</a>
+    </div>
+    {% else %}
+    <div class="edu-card text-center">
+        <h2>Empower Your Education with EduManage</h2>
+        <p>Join our vibrant learning community to access interactive courses, collaborate with peers, and track your academic progress.</p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="edu-card">
+                    <h3>For Students</h3>
+                    <p>Access course materials, submit assignments, and engage in discussions.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="edu-card">
+                    <h3>For Teachers</h3>
+                    <p>Manage classes, create assignments, and monitor student progress.</p>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'account_login' %}" class="edu-btn edu-btn-primary mr-3">Login</a>
+        <a href="{% url 'account_signup' %}" class="edu-btn edu-btn-secondary">Sign Up</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

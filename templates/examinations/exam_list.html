@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block main_content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5">Exam List</h1>
+    <div class="row">
+        {% for exam in exams %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ exam.name }}</h5>
+                    <p class="card-text">Subject: {{ exam.subject }}</p>
+                    <p class="card-text">Date: {{ exam.date }}</p>
+                    <p class="card-text">Created by: {{ exam.created_by }}</p>
+                    <a href="{% url 'examinations:exam_detail' exam.id %}" class="btn btn-primary">View Exam</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% if request.user.is_teacher %}
+    <div class="text-center mt-5">
+        <a href="{% url 'examinations:create_exam' %}" class="btn btn-primary">Create Exam</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

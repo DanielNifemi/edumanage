@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_head %}
+<script src="{% static 'ckeditor/ckeditor.js' %}"></script>
+<style>
+    .classroom-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .classroom-card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+    .classroom-title {
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .classroom-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .classroom-button:hover {
+        background-color: #0056b3;
+    }
+</style>
+{% endblock %}
+{% block main_content %}
+<div class="classroom-container">
+    <div class="classroom-card">
+        <h2 id="compose-message" class="classroom-title">Compose Message</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="classroom-button">Send Message</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
