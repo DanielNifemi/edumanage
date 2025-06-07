@@ -35,43 +35,16 @@
         color: #1967d2;
         text-decoration: none;
         padding: 0.5rem 0;
-        transition: all 0.3s ease;
+        transition: background-color 0.3s ease;
     }
     .dashboard-link:hover {
         background-color: #f1f3f4;
         border-radius: 4px;
-        text-decoration: none;
-        padding-left: 0.5rem;
     }
     .dashboard-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1rem;
-    }
-    .course-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0.75rem;
-        margin-bottom: 0.5rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-    .course-item:hover {
-        background-color: #f8f9fa;
-        border-color: #4285F4;
-        transform: translateX(5px);
-    }
-    .course-title {
-        color: #4285F4;
-        text-decoration: none;
-        font-weight: 500;
-    }
-    .course-title:hover {
-        text-decoration: none;
-        color: #1967d2;
-    }
     }
 </style>
 {% endblock %}
@@ -81,50 +54,6 @@
     <div class="welcome-section bg-primary text-white p-4 rounded mb-4">
         <h2>Welcome, {{ user.get_full_name|default:user.email }}</h2>
         <p>Current Role: <span class="badge bg-light text-primary">{{ user_type|title }}</span></p>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">My Courses</h5>
-                </div>
-                <div class="card-body">
-                    {% if user_type == 'teacher' %}
-                        {% for course in user.teacher.courses_taught.all|slice:":5" %}
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{% url 'course_detail' course.pk %}" class="text-decoration-none">
-                                    {{ course.course_code }}: {{ course.name }}
-                                </a>
-                                <span class="badge bg-primary">{{ course.students.count }} Students</span>
-                            </div>
-                        {% empty %}
-                            <p class="text-muted">You haven't created any courses yet.</p>
-                        {% endfor %}
-                        <div class="mt-3">
-                            <a href="{% url 'course_create' %}" class="btn btn-primary">Create Course</a>
-                            <a href="{% url 'course_list' %}" class="btn btn-outline-primary">View All Courses</a>
-                        </div>
-                    {% else %}
-                        {% for enrollment in user.student.courseenrollment_set.filter.all|slice:":5" %}
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <a href="{% url 'course_detail' enrollment.course.pk %}" class="text-decoration-none">
-                                    {{ enrollment.course.course_code }}: {{ enrollment.course.name }}
-                                </a>
-                                <span class="badge {% if enrollment.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-                                    {{ enrollment.is_active|yesno:"Active,Inactive" }}
-                                </span>
-                            </div>
-                        {% empty %}
-                            <p class="text-muted">You're not enrolled in any courses yet.</p>
-                        {% endfor %}
-                        <div class="mt-3">
-                            <a href="{% url 'course_list' %}" class="btn btn-primary">View All Courses</a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
     </div>
 
     {% if is_superuser %}
@@ -242,20 +171,8 @@
 
     <div class="dashboard-section">
         <h3 class="section-title">Common Features</h3>
-            <a href="{% url 'complete_profile' %}" class="dashboard-link" id="complete-profile-link">Complete Profile</a>
-        </div>
-        <!-- Debug info -->
-        <div class="d-none">
-            <p>Debug URL: {% url 'complete_profile' %}</p>
+            <a href="{% url 'complete_profile' %}" class="dashboard-link">Complete Profile</a>
         </div>
     </div>
 </div>
-{% block extra_js %}
-<script>
-document.getElementById('complete-profile-link').addEventListener('click', function(e) {
-    console.log('Link clicked');
-    console.log('Link href:', this.href);
-});
-</script>
-{% endblock %}
 {% endblock %}

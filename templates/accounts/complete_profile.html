@@ -45,58 +45,12 @@
     .submit-btn:hover {
         background-color: #1967d2;
     }
-    .divider {
-        border-top: 1px solid #dadce0;
-        margin: 2rem 0;
-    }
-    .section-title {
-        color: #3c4043;
-        font-size: 18px;
-        margin-bottom: 1rem;
-    }
-    .alert {
-        padding: 0.75rem 1rem;
-        margin-bottom: 1rem;
-        border-radius: 4px;
-    }
-    .alert-success {
-        background-color: #e6f4ea;
-        color: #1e8e3e;
-        border: 1px solid #d2e3d5;
-    }
-    .alert-error {
-        background-color: #fce8e6;
-        color: #d93025;
-        border: 1px solid #f5c6cb;
-    }
 </style>
 {% endblock %}
 
 {% block main_content %}
 <div class="profile-container">
     <h2 class="profile-title">Complete Your Profile</h2>
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-    
-    <!-- User Type Selection Form -->
-    <form method="post" id="typeForm">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="{{ type_form.user_type.id_for_label }}">Select User Type:</label>
-            {{ type_form.user_type }}
-        </div>
-    </form>
-
-    <div class="divider"></div>
-
-    <!-- Profile Details Form -->
-    <div class="section-title">{{ profile_type|title }} Details</div>
     <form method="post">
         {% csrf_token %}
         {% for field in form %}
@@ -107,20 +61,11 @@
                     <small style="color: #5f6368;">{{ field.help_text }}</small>
                 {% endif %}
                 {% for error in field.errors %}
-                    <p class="alert alert-error">{{ error }}</p>
+                    <p style="color: #d93025;">{{ error }}</p>
                 {% endfor %}
             </div>
         {% endfor %}
         <button type="submit" class="submit-btn">Save Profile</button>
     </form>
 </div>
-
-{% block extra_js %}
-<script>
-    // Auto-submit type form when selection changes
-    document.getElementById('{{ type_form.user_type.id_for_label }}').addEventListener('change', function() {
-        document.getElementById('typeForm').submit();
-    });
-</script>
-{% endblock %}
 {% endblock %}

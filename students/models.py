@@ -5,7 +5,7 @@ from django.conf import settings
 class Student(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     student_id = models.CharField(max_length=20, unique=True)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(null=True, blank=True)
     grade = models.CharField(max_length=10)
     address = models.TextField()
     parent_name = models.CharField(max_length=100)

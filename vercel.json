@@ -1,31 +1,26 @@
 {
-  "version": 2,
   "builds": [
     {
-      "src": "serverless/api.py",
-      "use": "@vercel/python",
+      "src": "build_files.sh",
+      "use": "@vercel/static-build",
       "config": {
-        "maxLambdaSize": "5mb"
+        "distDir": "staticfiles_build"
       }
     },
     {
-      "src": "static/**",
-      "use": "@vercel/static"
+      "src": "/edumanage/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "16mb" }
     }
   ],
   "routes": [
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "src": "/(.*)",
+      "dest": "edumanage/wsgi.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "serverless/api.py"
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
     }
-  ],
-  "env": {
-    "PYTHONPATH": ".",
-    "DJANGO_SETTINGS_MODULE": "edumanage.settings",
-    "DEBUG": "False"
-  }
+  ]
 }

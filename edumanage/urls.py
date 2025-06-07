@@ -8,12 +8,12 @@ from edumanage.views import home
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),  # our custom URLs first
-    path('accounts/', include('allauth.urls')),  # allauth URLs second
+    path('api/', include('edumanage.api')),  # API endpoints for React frontend
+    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('accounts.urls')),
     path('students/', include('students.urls')),
     path('teachers/', include('teachers.urls')),
     path('staff/', include('staff.urls')),
-    path('courses/', include('courses.urls')),
     path('discipline/', include('discipline.urls')),
     path('attendance/', include('attendance.urls')),
     path('communication/', include('communication.urls')),

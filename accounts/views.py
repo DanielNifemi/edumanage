@@ -188,8 +188,17 @@ def edit_profile(request, profile_type):
 @login_required
 def dashboard(request):
     context = {}
-    user_profile = request.user.userprofile
-    context['user_type'] = user_profile.user_type
+    try:
+        user_profile = request.user.userprofile
+        context['user_type'] = user_profile.user_type
+    except UserProfile.DoesNotExist:
+        # Create a default UserProfile if it doesn't exist
+        user_profile = UserProfile.objects.create(
+            user=request.user,
+            user_type='student'  # Default to student
+        )
+        context['user_type'] = user_profile.user_type
+    
     context['is_superuser'] = request.user.is_superuser
 
     # Get relevant profiles
@@ -208,12 +217,19 @@ def dashboard(request):
             'staff_profile': staff_profile,
             'available_roles': [role for role, _ in UserProfile.USER_TYPES]
         })
-    
-    # Load course information based on user type
-    if user_profile.user_type == 'teacher':
-        context['courses'] = request.user.teacher.courses_taught.all().prefetch_related('students')
-    elif user_profile.user_type == 'student':
-        context['enrollments'] = request.user.student.courseenrollment_set.select_related('course').all()
+      # Load course information based on user type
+    try:
+        if user_profile.user_type == 'teacher':
+            teacher = getattr(request.user, 'teacher', None)
+            if teacher:
+                context['courses'] = teacher.courses_taught.all().prefetch_related('students')
+        elif user_profile.user_type == 'student':
+            student = getattr(request.user, 'student', None)
+            if student:
+                context['enrollments'] = student.courseenrollment_set.select_related('course').all()
+    except Exception as e:
+        # Log the error but don't crash the dashboard
+        print(f"Error loading course information: {e}")
     
     return render(request, 'accounts/dashboard.html', context)
 
@@ -243,8 +259,60 @@ class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
 
 
+class StudentLoginView(LoginView):
+    template_name = 'accounts/login_student.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_role'] = 'student'
+        context['role_title'] = 'Student Portal'
+        context['role_description'] = 'Access your courses, grades, and assignments'
+        context['role_color'] = '#4285f4'  # Blue
+        return context
+
+
+class TeacherLoginView(LoginView):
+    template_name = 'accounts/login_teacher.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_role'] = 'teacher'
+        context['role_title'] = 'Teacher Portal'
+        context['role_description'] = 'Manage your classes, grade assignments, and track student progress'
+        context['role_color'] = '#34a853'  # Green
+        return context
+
+
+class StaffLoginView(LoginView):
+    template_name = 'accounts/login_staff.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_role'] = 'staff'
+        context['role_title'] = 'Staff Portal'
+        context['role_description'] = 'Administrative access to manage school operations'
+        context['role_color'] = '#fbbc04'  # Yellow
+        return context
+
+
+class AdminLoginView(LoginView):
+    template_name = 'accounts/login_admin.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_role'] = 'admin'
+        context['role_title'] = 'Administrator Portal'
+        context['role_description'] = 'Complete system access and management'
+        context['role_color'] = '#ea4335'  # Red
+        return context
+
+
 class CustomLogoutView(LogoutView):
+    """Custom logout view"""
     template_name = 'accounts/logout.html'
+    
+    def get_success_url(self):
+        return '/'  # Redirect to home page after logout
 
 
 @login_required
