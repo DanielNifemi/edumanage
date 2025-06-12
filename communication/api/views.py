@@ -218,15 +218,23 @@ class MessageViewSet(viewsets.ModelViewSet):
     def bulk_send(self, request):
         """
         Send a message to multiple users or groups.
-        Requires 'recipients' (list of user IDs) or 'recipient_roles' (list of roles).
+        Requires 'recipient_ids' (list of user IDs) or 'recipient_roles' (list of roles like 'student', 'teacher').
         """
         serializer = self.get_serializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            messages_sent = serializer.save()
-            return Response(
-                {'status': f'{len(messages_sent)} messages sent successfully'},
-                status=status.HTTP_201_CREATED
-            )
+            try:
+                messages_sent = serializer.save()
+                if not messages_sent:
+                    return Response(
+                        {'status': 'No messages sent. This might occur if the sender is the only recipient.'},
+                        status=status.HTTP_200_OK # Or 204 No Content, depending on preference
+                    )
+                return Response(
+                    {'status': f'{len(messages_sent)} messages sent successfully'},
+                    status=status.HTTP_201_CREATED
+                )
+            except serializers.ValidationError as e: # Catch validation errors from serializer.save() if any
+                return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])

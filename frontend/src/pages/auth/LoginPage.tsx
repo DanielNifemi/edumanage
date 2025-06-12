@@ -17,14 +17,12 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
     try {
       await login(email, password);
-      toast.success('Login successful!'); // Success toast
-      navigate('/student/dashboard'); // Or a role-based dashboard
-    } catch (err) {
-      // Error is handled by AuthContext and displayed via 'error' state
-      console.error('Login failed:', err);
-      if (!error) { // If AuthContext doesn't set an error, show a generic one
-        toast.error('Login failed. Please check your credentials.');
-      }
+      toast.success('Login successful!');
+      navigate('/student/dashboard'); 
+    } catch (err: unknown) {
+      console.error('Login failed in LoginPage:', err);
+      const message = error || (err instanceof Error ? err.message : 'Invalid email or password. Please try again.');
+      toast.error(message); 
     }
   };
 
@@ -60,7 +58,8 @@ const LoginPage: React.FC = () => {
                 disabled={loading}
               />
             </div>
-            {error && <p className="text-sm text-red-600 mb-2">{error}</p>} {/* Ensure error from context is visible */}
+            {/* Optionally, keep this paragraph for inline errors or remove if toast is sufficient */}
+            {/* {error && <p className=\"text-sm text-red-600 mb-2\">{error}</p>} */}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>

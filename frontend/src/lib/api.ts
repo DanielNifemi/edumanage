@@ -109,19 +109,92 @@ export interface UserProfileUpdateData {
   phone_number?: string;
 }
 
+export interface UserProfileData {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone_number?: string;
+  date_joined?: string;
+  last_login?: string;
+  is_active?: boolean;
+  is_staff?: boolean;
+  is_superuser?: boolean;
+  user_permissions?: string[];
+  groups?: string[];
+}
+
+export interface UserBasicData {
+  id: number;
+  username: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string; // Often constructed like `first_name + ' ' + last_name` or provided by backend
+  email?: string; // Optional: if needed for display or contact
+  // avatar_url?: string; // Optional: if you have avatars for users
+}
+
+// Added SentMessageData interface
+export interface SentMessageData {
+  recipient_id: number; // ID of the user receiving the message
+  subject: string;
+  body: string; // Content of the message
+}
+
+// Added ReceivedMessageData interface
+export interface ReceivedMessageData {
+  id: number | string; // Unique ID of the message
+  sender?: UserBasicData; // Information about the sender
+  recipient?: UserBasicData; // Information about the recipient
+  subject: string;
+  body: string; // Content of the message
+  created_at: string; // Timestamp of when the message was created (ISO 8601 format)
+  is_read: boolean;
+  // Fallback fields if sender/recipient objects are not fully populated or available
+  sender_name?: string; 
+  recipient_name?: string;
+}
+
 const API_BASE_URL = 'http://localhost:8000/api'; // Adjusted to match backend DRF routes
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
+  withCredentials: true, // Important for cookies, including CSRF
 });
 
-// Add request interceptor to include auth token
+// Add a request interceptor to include the CSRF token
 api.interceptors.request.use(
   (config) => {
+    // Function to get CSRF token from cookies
+    function getCookie(name: string) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          // Does this cookie string begin with the name we want?
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            try {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            } catch (e) {
+              console.error(`Error decoding cookie "${name}":`, e);
+              // If decoding fails, ensure cookieValue is null to prevent using a malformed token.
+              cookieValue = null;
+            }
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    if (config.method && ['post', 'put', 'delete', 'patch'].includes(config.method.toLowerCase())) {
+      const csrfToken = getCookie('csrftoken');
+      if (csrfToken) {
+        config.headers['X-CSRFToken'] = csrfToken;
+      }
+    }
     const token = localStorage.getItem('edumanage_token');
     if (token) {
       // config.headers.Authorization = `Token ${token}`; // Changed to 'Token' based on typical Django REST framework token auth
@@ -321,12 +394,25 @@ export const schedulesAPI = {
 
 // Communication API
 export const communicationAPI = {
-  getMessages: async () => {
-    const response = await api.get('/communication/messages/');
+  getMessages: async (): Promise<ReceivedMessageData[]> => { // Ensure getMessages returns an array of ReceivedMessageData
+    const response = await api.get<ReceivedMessageData[]>('/communication/messages/');
+    return response.data;
+  },
+  getInboxMessages: async (): Promise<ReceivedMessageData[]> => {
+    const response = await api.get<ReceivedMessageData[]>('/communication/messages/inbox/');
+    return response.data;
+  },
+  getSentMessages: async (): Promise<ReceivedMessageData[]> => {
+    const response = await api.get<ReceivedMessageData[]>('/communication/messages/sent/');
     return response.data;
   },
   sendMessage: async (messageData: MessageData) => {
     const response = await api.post('/communication/messages/', messageData);
+    return response.data;
+  },
+
+  createMessage: async (messageData: SentMessageData): Promise<ReceivedMessageData> => {
+    const response = await api.post<ReceivedMessageData>('/communication/messages/', messageData);
     return response.data;
   },
 
@@ -458,6 +544,15 @@ export const announcementsAPI = {
     );
     return response.data;
   },
+};
+
+// Accounts API - Add getUsers if it's not already present or correctly defined
+export const accountsAPI = {
+  getUsers: async (): Promise<UserBasicData[]> => {
+    const response = await api.get<UserBasicData[]>('/auth/users/'); // Corrected path
+    return response.data;
+  },
+  // ... any other existing accountsAPI methods
 };
 
 export default api;

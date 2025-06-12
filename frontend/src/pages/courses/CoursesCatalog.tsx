@@ -1,46 +1,66 @@
-
 import React, { useState, useEffect } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+// import DashboardLayout from "@/components/layout/DashboardLayout"; // Removed
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Filter, BookOpen, Clock, Users, Plus, Edit, Trash2, Eye, Calendar, GraduationCap } from "lucide-react";
-import { coursesAPI, CourseData } from "@/lib/api";
+import { coursesAPI } from "@/lib/api";
+import { useNavigate } from "react-router-dom";
 
-interface Course extends CourseData {
-  id: string;
-  subject?: {
-    id: string;
-    name: string;
-    code: string;
-  };
-  instructor?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    username: string;
-  };
+// Define interfaces for better type safety
+interface Instructor {
+  first_name: string;
+  last_name: string;
+}
+
+interface Subject {
+  id?: number | string;
+  name: string;
+}
+
+interface Course {
+  id: number; // Assuming ID is a number
+  title: string;
+  description: string;
+  subject?: Subject | null;
+  instructor?: Instructor | null;
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced';
+  status: 'draft' | 'published' | 'archived';
+  start_date?: string | null;
+  end_date?: string | null;
+  max_students?: number | null;
+  credits?: number | null;
   enrollment_count?: number;
-  is_full?: boolean;
-  completion_rate?: number;
+  completion_rate?: number; // Add if available and used
+}
+
+interface CourseEditFormData {
+  title: string;
+  description: string;
+  difficulty_level: 'beginner' | 'intermediate' | 'advanced';
+  status: 'draft' | 'published' | 'archived';
+  start_date: string; // Will be '' if original is null/undefined
+  end_date: string;   // Will be '' if original is null/undefined
+  max_students: number;
+  credits: number;
 }
 
 const CoursesCatalog = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [formData, setFormData] = useState<CourseData>({});
+  const [formData, setFormData] = useState<Partial<CourseEditFormData>>({});
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterDifficulty, setFilterDifficulty] = useState("all");
   const { toast } = useToast();
@@ -50,7 +70,20 @@ const CoursesCatalog = () => {
     try {
       setLoading(true);
       const response = await coursesAPI.getAll();
-      setCourses(response.results || response || []);
+      // Ensure that courses is always an array
+      if (Array.isArray(response.results)) {
+        setCourses(response.results);
+      } else if (Array.isArray(response)) {
+        setCourses(response);
+      } else {
+        setCourses([]); // Default to empty array if response structure is unexpected
+        console.warn("API response for courses was not an array:", response);
+        toast({
+          title: "Warning",
+          description: "Received unexpected data structure for courses.",
+          variant: "default",
+        });
+      }
     } catch (error) {
       console.error('Error fetching courses:', error);
       toast({
@@ -58,38 +91,20 @@ const CoursesCatalog = () => {
         description: "Failed to fetch courses. Please try again.",
         variant: "destructive",
       });
+      setCourses([]); // Ensure courses is an array in case of error
     } finally {
       setLoading(false);
     }
   };
 
-  // Create new course
-  const handleCreateCourse = async () => {
-    try {
-      const response = await coursesAPI.create(formData);
-      await fetchCourses();
-      setIsCreateDialogOpen(false);
-      setFormData({});
-      toast({
-        title: "Success",
-        description: "Course created successfully.",
-      });
-    } catch (error) {
-      console.error('Error creating course:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create course. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   // Update course
   const handleUpdateCourse = async () => {
-    if (!selectedCourse) return;
+    if (!selectedCourse || !formData) return; // Added !formData check for safety
     
     try {
-      await coursesAPI.update(selectedCourse.id, formData);
+      // Ensure all required fields for CourseEditFormData are present if API expects full object
+      // For now, assuming API handles partial updates or formData is complete due to openEditDialog logic
+      await coursesAPI.update(selectedCourse.id.toString(), formData as CourseEditFormData);
       await fetchCourses();
       setIsEditDialogOpen(false);
       setFormData({});
@@ -109,11 +124,11 @@ const CoursesCatalog = () => {
   };
 
   // Delete course
-  const handleDeleteCourse = async (courseId: string) => {
+  const handleDeleteCourse = async (courseId: number) => {
     if (!confirm("Are you sure you want to delete this course?")) return;
     
     try {
-      await coursesAPI.delete(courseId);
+      await coursesAPI.delete(courseId.toString());
       await fetchCourses();
       toast({
         title: "Success",
@@ -139,8 +154,8 @@ const CoursesCatalog = () => {
       status: course.status || 'draft',
       start_date: course.start_date || '',
       end_date: course.end_date || '',
-      max_students: course.max_students || 30,
-      credits: course.credits || 3,
+      max_students: course.max_students ?? 30,
+      credits: course.credits ?? 3,
     });
     setIsEditDialogOpen(true);
   };
@@ -152,7 +167,7 @@ const CoursesCatalog = () => {
   };
 
   // Filter courses based on search, status, and difficulty
-  const filteredCourses = courses.filter(course => {
+  const filteredCourses = courses.filter((course: Course) => { // Added type for course
     const matchesSearch = !searchTerm || 
       (course.title?.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (course.description?.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -167,7 +182,7 @@ const CoursesCatalog = () => {
   });
 
   // Get difficulty badge variant
-  const getDifficultyBadgeVariant = (difficulty: string) => {
+  const getDifficultyBadgeVariant = (difficulty: 'beginner' | 'intermediate' | 'advanced' | undefined) => {
     switch (difficulty) {
       case 'beginner': return 'secondary';
       case 'intermediate': return 'default';
@@ -177,7 +192,7 @@ const CoursesCatalog = () => {
   };
 
   // Get status badge variant
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: 'draft' | 'published' | 'archived' | undefined) => {
     switch (status) {
       case 'published': return 'default';
       case 'draft': return 'secondary';
@@ -192,152 +207,21 @@ const CoursesCatalog = () => {
   }, []);
 
   return (
-    <DashboardLayout>
+    // <DashboardLayout> // Removed
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Course Catalog</h1>
             <p className="text-gray-600">Manage and browse available courses</p>
           </div>
-          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Create Course
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create New Course</DialogTitle>
-                <DialogDescription>
-                  Add a new course to the catalog. Fill in all required information.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="title" className="text-right">
-                    Title*
-                  </Label>
-                  <Input
-                    id="title"
-                    value={formData.title || ''}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="col-span-3"
-                    placeholder="Course title"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Description*
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={formData.description || ''}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="col-span-3"
-                    placeholder="Course description"
-                    rows={3}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="difficulty" className="text-right">
-                    Difficulty
-                  </Label>
-                  <Select 
-                    value={formData.difficulty_level || 'beginner'} 
-                    onValueChange={(value) => setFormData({ ...formData, difficulty_level: value as 'beginner' | 'intermediate' | 'advanced' })}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select difficulty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="beginner">Beginner</SelectItem>
-                      <SelectItem value="intermediate">Intermediate</SelectItem>
-                      <SelectItem value="advanced">Advanced</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="status" className="text-right">
-                    Status
-                  </Label>
-                  <Select 
-                    value={formData.status || 'draft'} 
-                    onValueChange={(value) => setFormData({ ...formData, status: value as 'draft' | 'published' | 'archived' })}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="credits" className="text-right">
-                    Credits
-                  </Label>
-                  <Input
-                    id="credits"
-                    type="number"
-                    value={formData.credits || 3}
-                    onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
-                    className="col-span-3"
-                    min="1"
-                    max="6"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="max_students" className="text-right">
-                    Max Students
-                  </Label>
-                  <Input
-                    id="max_students"
-                    type="number"
-                    value={formData.max_students || 30}
-                    onChange={(e) => setFormData({ ...formData, max_students: parseInt(e.target.value) })}
-                    className="col-span-3"
-                    min="1"
-                    max="100"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="start_date" className="text-right">
-                    Start Date
-                  </Label>
-                  <Input
-                    id="start_date"
-                    type="date"
-                    value={formData.start_date || ''}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="end_date" className="text-right">
-                    End Date
-                  </Label>
-                  <Input
-                    id="end_date"
-                    type="date"
-                    value={formData.end_date || ''}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                    className="col-span-3"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="button" onClick={handleCreateCourse}>
-                  Create Course
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          {/* Removed Dialog, DialogTrigger, DialogContent for Create Course */}
+          <Button 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/teacher/courses/new')} // Updated
+          >
+            <Plus className="h-4 w-4" />
+            Create Course
+          </Button>
         </div>
 
         {/* Search and Filters */}
@@ -486,9 +370,10 @@ const CoursesCatalog = () => {
                 <CardContent className="p-12 text-center">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No courses found matching your criteria.</p>
+                  {/* Updated this button as well to navigate, assuming it's for teachers */}
                   <Button 
                     className="mt-4" 
-                    onClick={() => setIsCreateDialogOpen(true)}
+                    onClick={() => navigate('/teacher/courses/new')}
                   >
                     Create First Course
                   </Button>
@@ -574,8 +459,11 @@ const CoursesCatalog = () => {
                 <Input
                   id="edit-credits"
                   type="number"
-                  value={formData.credits || 3}
-                  onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })}
+                  value={formData.credits || ''}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    setFormData({ ...formData, credits: isNaN(val) ? 1 : Math.max(1, Math.min(val, 6)) }); // Ensure value is between 1 and 6, default to 1 if NaN
+                  }}
                   className="col-span-3"
                   min="1"
                   max="6"
@@ -588,8 +476,11 @@ const CoursesCatalog = () => {
                 <Input
                   id="edit-max-students"
                   type="number"
-                  value={formData.max_students || 30}
-                  onChange={(e) => setFormData({ ...formData, max_students: parseInt(e.target.value) })}
+                  value={formData.max_students || ''}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    setFormData({ ...formData, max_students: isNaN(val) ? 1 : Math.max(1, Math.min(val, 100)) }); // Ensure value is between 1 and 100, default to 1 if NaN
+                  }}
                   className="col-span-3"
                   min="1"
                   max="100"
@@ -710,7 +601,7 @@ const CoursesCatalog = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </DashboardLayout>
+    // </DashboardLayout> // Removed
   );
 };
 

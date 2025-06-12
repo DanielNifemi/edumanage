@@ -1,68 +1,65 @@
-
-import { useAuth } from "@/hooks/useAuth";
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Calendar, FileText, Clock, TrendingUp, Bell } from "lucide-react";
+import { Users, Briefcase, CalendarCheck, Settings, UserPlus, FileText, Building, Bell } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Link } from "react-router-dom";
 
 const StaffDashboard = () => {
   const { user } = useAuth();
 
-  const workloadStats = [
-    { label: "Active Tasks", value: "8", change: "-2 from yesterday", icon: FileText },
-    { label: "Students Assisted", value: "24", change: "+5 from yesterday", icon: Users },
-    { label: "Hours This Week", value: "32", change: "8 hours remaining", icon: Clock },
-    { label: "Department Rating", value: "4.8", change: "+0.2 this month", icon: TrendingUp },
+  const quickStatsData = [
+    { label: "Total Students", value: "1250", icon: Users, color: "blue" },
+    { label: "Active Staff", value: "75", icon: Briefcase, color: "green" },
+    { label: "Upcoming Events", value: "5", icon: CalendarCheck, color: "orange" },
+    { label: "System Alerts", value: "2", icon: Bell, color: "red" },
   ];
 
-  const todaySchedule = [
-    { time: "9:00 AM", task: "Student Registration Support", location: "Registration Office", type: "student-service" },
-    { time: "11:00 AM", task: "Department Meeting", location: "Conference Room A", type: "meeting" },
-    { time: "2:00 PM", task: "Academic Records Review", location: "Records Office", type: "administrative" },
-    { time: "4:00 PM", task: "Parent Consultation", location: "Office 205", type: "consultation" },
+  const recentActivities = [
+    { id: 1, activity: "New student enrollment: John B.", time: "10 mins ago", category: "Enrollment" },
+    { id: 2, activity: "Staff meeting scheduled for 3 PM.", time: "1 hour ago", category: "Meetings" },
+    { id: 3, activity: "Maintenance request #1024 closed.", time: "3 hours ago", category: "Maintenance" },
+    { id: 4, activity: "New course 'Advanced Python' added.", time: "Yesterday", category: "Academics" },
   ];
 
-  const pendingRequests = [
-    { id: 1, type: "Transcript Request", student: "Alice Johnson", submitted: "2 hours ago", priority: "high" },
-    { id: 2, type: "Course Change", student: "Bob Smith", submitted: "4 hours ago", priority: "medium" },
-    { id: 3, type: "Grade Appeal", student: "Carol Davis", submitted: "1 day ago", priority: "high" },
-    { id: 4, type: "Transfer Credit", student: "David Wilson", submitted: "2 days ago", priority: "low" },
+  const pendingTasks = [
+    { id: 1, task: "Process financial aid applications", due: "Tomorrow", priority: "high" as const },
+    { id: 2, task: "Update student records for Grade 10", due: "Friday", priority: "medium" as const },
+    { id: 3, task: "Organize staff training session", due: "Next week", priority: "low" as const },
   ];
 
-  const notifications = [
-    { id: 1, message: "New student enrollment forms ready for review", time: "30 minutes ago" },
-    { id: 2, message: "Department budget meeting rescheduled", time: "2 hours ago" },
-    { id: 3, message: "Updated academic calendar available", time: "1 day ago" },
-  ];
+  const getPriorityVariant = (priority: 'high' | 'medium' | 'low') => {
+    if (priority === 'high') return 'destructive';
+    if (priority === 'medium') return 'secondary';
+    return 'outline';
+  };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-6 text-white">
           <h1 className="text-3xl font-bold mb-2">
-            Welcome, {user?.firstName}! 🏢
+            Welcome, {user?.first_name || 'Staff Member'}! 🏢
           </h1>
-          <p className="text-blue-100">
-            You have 4 tasks scheduled today and 8 pending student requests. Let's help students succeed!
+          <p className="text-indigo-100">
+            Here's what's happening today. You have {pendingTasks.length} pending tasks.
           </p>
         </div>
 
-        {/* Workload Statistics */}
+        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {workloadStats.map((stat, index) => (
+          {quickStatsData.map((stat, index) => (
             <Card key={index} className="border-0 shadow-md">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                    <p className="text-sm text-gray-500">{stat.change}</p>
+                    <p className="text-sm font-medium text-gray-500">{stat.label}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <stat.icon className="h-6 w-6 text-blue-600" />
+                  <div className={`w-12 h-12 bg-${stat.color}-100 rounded-lg flex items-center justify-center`}>
+                    <stat.icon className={`h-6 w-6 text-${stat.color}-600`} />
                   </div>
                 </div>
               </CardContent>
@@ -70,162 +67,80 @@ const StaffDashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Today's Schedule */}
-          <Card className="border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Today's Schedule
-              </CardTitle>
-              <CardDescription>Your tasks and appointments</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {todaySchedule.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className={`w-3 h-3 rounded-full ${
-                      item.type === 'student-service' ? 'bg-blue-500' : 
-                      item.type === 'meeting' ? 'bg-green-500' : 
-                      item.type === 'administrative' ? 'bg-orange-500' : 'bg-purple-500'
-                    }`}></div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 text-sm">{item.task}</p>
-                      <p className="text-xs text-gray-600">{item.location}</p>
-                    </div>
-                    <p className="text-sm font-medium text-gray-700">{item.time}</p>
-                  </div>
-                ))}
-              </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                View Full Calendar
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Pending Requests */}
-          <Card className="lg:col-span-2 border-0 shadow-md">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Pending Student Requests
-              </CardTitle>
-              <CardDescription>Requests requiring your attention</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {pendingRequests.map((request) => (
-                  <div key={request.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <h4 className="font-medium text-gray-900">{request.type}</h4>
-                        <Badge 
-                          variant={request.priority === 'high' ? 'destructive' : 
-                                  request.priority === 'medium' ? 'default' : 'secondary'}
-                        >
-                          {request.priority}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600">Student: {request.student}</p>
-                      <p className="text-xs text-gray-500">Submitted: {request.submitted}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
-                        Review
-                      </Button>
-                      <Button size="sm">
-                        Process
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link to="/staff/requests">
-                <Button variant="outline" className="w-full mt-4">
-                  View All Requests
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Quick Actions & Notifications */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Quick Actions */}
+          {/* Recent Activities */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common staff tasks and tools</CardDescription>
+              <CardTitle>Recent Activities</CardTitle>
+              <CardDescription>Latest updates and actions in the system</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                <Button className="h-20 flex-col gap-2" variant="outline">
-                  <Users className="h-5 w-5" />
-                  <span className="text-sm">Student Lookup</span>
-                </Button>
-                <Button className="h-20 flex-col gap-2" variant="outline">
-                  <FileText className="h-5 w-5" />
-                  <span className="text-sm">Generate Report</span>
-                </Button>
-                <Button className="h-20 flex-col gap-2" variant="outline">
-                  <Calendar className="h-5 w-5" />
-                  <span className="text-sm">Schedule Meeting</span>
-                </Button>
-                <Button className="h-20 flex-col gap-2" variant="outline">
-                  <Bell className="h-5 w-5" />
-                  <span className="text-sm">Send Notice</span>
-                </Button>
+              <div className="space-y-4">
+                {recentActivities.length > 0 ? recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                    <div className="flex-shrink-0 pt-1">
+                      <Badge variant="outline" className="text-xs">{activity.category}</Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{activity.activity}</p>
+                      <p className="text-xs text-gray-500">{activity.time}</p>
+                    </div>
+                  </div>
+                )) : <p className="text-sm text-gray-500">No recent activities.</p>}
               </div>
             </CardContent>
           </Card>
 
-          {/* Notifications */}
+          {/* Pending Tasks */}
           <Card className="border-0 shadow-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Recent Notifications
-              </CardTitle>
+              <CardTitle>Pending Tasks</CardTitle>
+              <CardDescription>Important tasks requiring your attention</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {notifications.map((notification) => (
-                  <div key={notification.id} className="p-3 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-900 mb-1">{notification.message}</p>
-                    <p className="text-xs text-gray-500">{notification.time}</p>
+                {pendingTasks.length > 0 ? pendingTasks.map((task) => (
+                  <div key={task.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors">
+                    <div>
+                      <p className="font-semibold text-sm">{task.task}</p>
+                      <p className="text-xs text-gray-600">Due: {task.due}</p>
+                    </div>
+                    <Badge variant={getPriorityVariant(task.priority)} className="capitalize text-xs">{task.priority}</Badge>
                   </div>
-                ))}
+                )) : <p className="text-sm text-gray-500">No pending tasks.</p>}
               </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                View All Notifications
-              </Button>
             </CardContent>
           </Card>
         </div>
 
-        {/* Department Overview */}
+        {/* Quick Actions */}
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Department Performance
-            </CardTitle>
-            <CardDescription>Overview of departmental metrics and achievements</CardDescription>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Commonly used staff functions</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-2xl font-bold text-blue-600">98%</h3>
-                <p className="text-sm text-gray-600">Request Processing Rate</p>
-              </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <h3 className="text-2xl font-bold text-green-600">4.8/5</h3>
-                <p className="text-sm text-gray-600">Student Satisfaction</p>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <h3 className="text-2xl font-bold text-purple-600">2.5hrs</h3>
-                <p className="text-sm text-gray-600">Avg. Response Time</p>
-              </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <Link to="/staff/student-enrollment">
+                <Button variant="outline" className="w-full h-24 flex flex-col items-center justify-center">
+                  <UserPlus className="mb-1 h-6 w-6" /> Enroll Student
+                </Button>
+              </Link>
+              <Link to="/staff/manage-records">
+                <Button variant="outline" className="w-full h-24 flex flex-col items-center justify-center">
+                  <FileText className="mb-1 h-6 w-6" /> Manage Records
+                </Button>
+              </Link>
+              <Link to="/staff/facility-management">
+                <Button variant="outline" className="w-full h-24 flex flex-col items-center justify-center">
+                  <Building className="mb-1 h-6 w-6" /> Facility Management
+                </Button>
+              </Link>
+              <Link to="/staff/system-settings">
+                <Button variant="outline" className="w-full h-24 flex flex-col items-center justify-center">
+                  <Settings className="mb-1 h-6 w-6" /> System Settings
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

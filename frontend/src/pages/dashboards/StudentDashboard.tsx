@@ -1,105 +1,83 @@
-
-import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import DashboardLayout from '@/components/layout/DashboardLayout'; // Added DashboardLayout import
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Calendar, BookOpen, ClipboardCheck, Clock, TrendingUp, Bell } from "lucide-react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Link } from "react-router-dom";
+import { Users, BookOpen, TrendingUp, ClipboardCheck, Bell, Calendar, CheckCircle, Clock, FileText, UserPlus, Edit, MessageSquare, Settings } from "lucide-react";
 
 const StudentDashboard = () => {
   const { user } = useAuth();
 
   const upcomingAssignments = [
-    { id: 1, title: "Math Problem Set 5", course: "Calculus I", dueDate: "2024-01-15", priority: "high" },
-    { id: 2, title: "History Essay", course: "World History", dueDate: "2024-01-18", priority: "medium" },
-    { id: 3, title: "Lab Report", course: "Chemistry", dueDate: "2024-01-20", priority: "low" },
+    { id: 1, title: "Math Problem Set 5", course: "Calculus I", dueDate: "2025-06-15", priority: "high" },
+    { id: 2, title: "History Essay", course: "World History", dueDate: "2025-06-18", priority: "medium" },
+    { id: 3, title: "Lab Report", course: "Chemistry", dueDate: "2025-06-20", priority: "low" },
   ];
 
   const currentCourses = [
-    { id: 1, name: "Calculus I", instructor: "Dr. Smith", progress: 75, nextClass: "Today 2:00 PM" },
-    { id: 2, name: "World History", instructor: "Prof. Johnson", progress: 60, nextClass: "Tomorrow 10:00 AM" },
-    { id: 3, name: "Chemistry", instructor: "Dr. Brown", progress: 85, nextClass: "Wed 1:00 PM" },
-    { id: 4, name: "English Literature", instructor: "Ms. Davis", progress: 70, nextClass: "Thu 11:00 AM" },
+    { id: 1, name: "Calculus I", instructor: "Dr. Smith", progress: 75, nextClass: "Today 2:00 PM", color: "blue" },
+    { id: 2, name: "World History", instructor: "Prof. Johnson", progress: 60, nextClass: "Tomorrow 10:00 AM", color: "purple" },
+    { id: 3, name: "Chemistry", instructor: "Dr. Brown", progress: 85, nextClass: "Wed 1:00 PM", color: "green" },
+    { id: 4, name: "English Literature", instructor: "Ms. Davis", progress: 70, nextClass: "Thu 11:00 AM", color: "orange" },
   ];
 
   const recentAnnouncements = [
-    { id: 1, title: "Midterm Exam Schedule Released", time: "2 hours ago" },
-    { id: 2, title: "Library Hours Extended", time: "1 day ago" },
-    { id: 3, title: "Career Fair Next Week", time: "3 days ago" },
+    { id: 1, title: "Midterm Exam Schedule Released", time: "2 hours ago", course: "All Courses" },
+    { id: 2, title: "Library Hours Extended for Finals", time: "1 day ago", course: "General" },
+    { id: 3, title: "Career Fair Next Week - Sign Up!", time: "3 days ago", course: "General" },
   ];
+
+  const quickStats = [
+      { label: "Active Courses", value: currentCourses.length, icon: BookOpen, color: "blue" },
+      { label: "Pending Assignments", value: upcomingAssignments.filter(a => a.priority !== 'low').length, icon: ClipboardCheck, color: "orange" }, // Example: count high/medium priority
+      { label: "Overall Progress", value: "72%", icon: TrendingUp, color: "green" }, // Mocked overall progress
+      { label: "Attendance Rate", value: "95%", icon: CheckCircle, color: "purple" }, // Mocked attendance
+  ];
+
+  const getPriorityBadgeVariant = (priority: string) => {
+    if (priority === 'high') return 'destructive';
+    if (priority === 'medium') return 'default';
+    return 'secondary';
+  };
+
+  const getProgressColor = (progress: number) => {
+    if (progress < 50) return "bg-red-500";
+    if (progress < 80) return "bg-yellow-500";
+    return "bg-green-500";
+  };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-6 text-white">
           <h1 className="text-3xl font-bold mb-2">
-            Welcome back, {user?.firstName}! 👋
+            Welcome back, {user?.first_name || 'Student'}! 👋
           </h1>
           <p className="text-blue-100">
-            You have 3 upcoming assignments and 2 classes today. Let's make it a productive day!
+            Here's your academic progress and upcoming tasks at a glance.
           </p>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Enrolled Courses</p>
-                  <p className="text-3xl font-bold text-gray-900">4</p>
+          {quickStats.map((stat, index) => (
+            <Card key={index} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-gray-500">{stat.label}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                  </div>
+                  <div className={`w-12 h-12 bg-${stat.color}-100 rounded-lg flex items-center justify-center`}>
+                    <stat.icon className={`h-6 w-6 text-${stat.color}-600`} />
+                  </div>
                 </div>
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-6 w-6 text-blue-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Assignments</p>
-                  <p className="text-3xl font-bold text-gray-900">3</p>
-                </div>
-                <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                  <ClipboardCheck className="h-6 w-6 text-orange-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Attendance Rate</p>
-                  <p className="text-3xl font-bold text-gray-900">94%</p>
-                </div>
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">GPA</p>
-                  <p className="text-3xl font-bold text-gray-900">3.7</p>
-                </div>
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -107,42 +85,30 @@ const StudentDashboard = () => {
           <Card className="lg:col-span-2 border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <ClipboardCheck className="h-5 w-5" />
+                <ClipboardCheck className="h-5 w-5 text-orange-600" />
                 Upcoming Assignments
               </CardTitle>
               <CardDescription>
-                Stay on top of your deadlines
+                Stay on top of your deadlines.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {upcomingAssignments.map((assignment) => (
-                  <div key={assignment.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{assignment.title}</h4>
-                      <p className="text-sm text-gray-600">{assignment.course}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge 
-                        variant={assignment.priority === 'high' ? 'destructive' : 
-                                assignment.priority === 'medium' ? 'default' : 'secondary'}
-                      >
-                        {assignment.priority}
-                      </Badge>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">Due {assignment.dueDate}</p>
-                        <p className="text-xs text-gray-500 flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          3 days left
-                        </p>
-                      </div>
+                  <div key={assignment.id} className="p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors border">
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h4 className="font-semibold text-sm">{assignment.title}</h4>
+                            <p className="text-xs text-gray-500">{assignment.course} - Due: {new Date(assignment.dueDate).toLocaleDateString()}</p>
+                        </div>
+                        <Badge variant={getPriorityBadgeVariant(assignment.priority)}>{assignment.priority}</Badge>
                     </div>
                   </div>
                 ))}
               </div>
               <Link to="/student/assignments">
                 <Button variant="outline" className="w-full mt-4">
-                  View All Assignments
+                    View All Assignments
                 </Button>
               </Link>
             </CardContent>
@@ -152,21 +118,16 @@ const StudentDashboard = () => {
           <Card className="border-0 shadow-md">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
+                <Bell className="h-5 w-5 text-purple-600" />
                 Recent Announcements
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {recentAnnouncements.map((announcement) => (
-                  <div key={announcement.id} className="space-y-2">
-                    <h4 className="font-medium text-gray-900 text-sm leading-tight">
-                      {announcement.title}
-                    </h4>
-                    <p className="text-xs text-gray-500">{announcement.time}</p>
-                    {announcement.id !== recentAnnouncements.length && (
-                      <hr className="border-gray-200" />
-                    )}
+                  <div key={announcement.id} className="p-3 bg-purple-50 border-l-4 border-purple-400 rounded-r-md">
+                    <h4 className="font-semibold text-sm text-purple-700">{announcement.title}</h4>
+                    <p className="text-xs text-purple-500">{announcement.course} - {announcement.time}</p>
                   </div>
                 ))}
               </div>
@@ -181,45 +142,38 @@ const StudentDashboard = () => {
         <Card className="border-0 shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
+              <BookOpen className="h-5 w-5 text-blue-600" />
               Current Courses
             </CardTitle>
             <CardDescription>
-              Your enrolled courses and progress
+              Your enrolled courses and progress.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {currentCourses.map((course) => (
-                <div key={course.id} className="p-4 bg-gray-50 rounded-lg space-y-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{course.name}</h4>
-                      <p className="text-sm text-gray-600">{course.instructor}</p>
-                    </div>
-                    <Badge variant="outline">{course.progress}% Complete</Badge>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Progress</span>
-                      <span className="font-medium">{course.progress}%</span>
-                    </div>
-                    <Progress value={course.progress} className="h-2" />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      {course.nextClass}
-                    </div>
-                    <Link to={`/courses/${course.id}`}>
-                      <Button size="sm" variant="outline">
-                        View Course
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
+                <Card key={course.id} className={`border-l-4 border-${course.color}-500 shadow-sm hover:shadow-md transition-shadow`}>
+                  <CardHeader>
+                    <CardTitle className="text-md">{course.name}</CardTitle>
+                    <CardDescription>Instructor: {course.instructor}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="mb-2">
+                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Progress</span>
+                            <span>{course.progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
+                          <div 
+                            className={`h-2 rounded-full ${getProgressColor(course.progress)}`}
+                            style={{ width: `${course.progress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    <p className="text-xs text-gray-500"><Clock className="inline h-3 w-3 mr-1"/>Next class: {course.nextClass}</p>
+                    <Button variant="outline" size="sm" className="mt-3 w-full text-xs">Go to Course</Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </CardContent>

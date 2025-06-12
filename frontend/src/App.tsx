@@ -14,11 +14,11 @@ import RegisterPage from "./pages/auth/RegisterPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext"; // Added AuthProvider import
 
-// Dashboard components (Placeholder imports - create these components as needed)
-const StudentDashboard = () => <div>Student Dashboard</div>; // Placeholder
-const TeacherDashboard = () => <div>Teacher Dashboard</div>; // Placeholder
-const AdminDashboard = () => <div>Admin Dashboard</div>;   // Placeholder
-const StaffDashboard = () => <div>Staff Dashboard</div>;   // Placeholder
+// Dashboard components
+import StudentDashboardPage from './pages/StudentDashboardPage'; // Added import
+import TeacherDashboardPage from './pages/TeacherDashboardPage'; // Added import
+import AdminDashboardPage from './pages/AdminDashboardPage';   // Added import
+import StaffDashboardPage from './pages/StaffDashboardPage';     // Added import
 
 // Page components (Placeholder imports - create these components as needed)
 const UsersList = () => <div>Users List</div>;             // Placeholder
@@ -38,10 +38,11 @@ import Assignments from "./pages/assignments/Assignments";
 import ProfilePage from "./pages/ProfilePage";
 import NotificationsPage from './pages/NotificationsPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
-import CoursesPage from './pages/CoursesPage'; // Added import
+import CoursesCatalog from './pages/courses/CoursesCatalog'; // Added import for CoursesCatalog
 import SchedulePage from './pages/SchedulePage'; // Added import
 import MessagesPage from './pages/MessagesPage'; // Added import
 import SettingsPage from './pages/SettingsPage'; // Added import
+import CreateCoursePage from './pages/teacher/CreateCoursePage'; // Corrected import path
 
 const queryClient = new QueryClient();
 
@@ -63,10 +64,10 @@ const App = () => (
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               {/* Dashboard Routes */}
-              <Route path="/student/dashboard" element={<StudentDashboard />} />
-              <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/staff/dashboard" element={<StaffDashboard />} />
+              <Route path="/student/dashboard" element={<StudentDashboardPage />} />
+              <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
             
               {/* Profile, Notifications, Announcements */}
               <Route path="/profile" element={<ProfilePage />} />
@@ -82,6 +83,7 @@ const App = () => (
               <Route path="/teacher/classes" element={<TeacherClasses />} />
               <Route path="/teacher/assignments" element={<TeacherAssignments />} />
               <Route path="/teacher/attendance" element={<TeacherAttendance />} />
+              <Route path="/teacher/courses/new" element={<CreateCoursePage />} /> {/* Added route for creating new course */}
             
               {/* Staff Routes */}
               <Route path="/staff/reports" element={<StaffReports />} />
@@ -101,12 +103,14 @@ const App = () => (
             
               {/* Settings Route */}
               <Route path="/settings" element={<SettingsPage />} />
+
+              {/* Course Routes - Moved inside ProtectedRoute */}
+              <Route path="/courses" element={<CoursesCatalog />} /> 
+              <Route path="/courses/:id" element={<CourseDetails />} />
             </Route>
             
             {/* Publicly accessible lists (if any) - adjust protection as needed */}
             <Route path="/students" element={<StudentsList />} /> 
-            <Route path="/courses" element={<CoursesPage />} /> 
-            <Route path="/courses/:id" element={<CourseDetails />} />
             
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />

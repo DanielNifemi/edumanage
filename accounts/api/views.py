@@ -60,8 +60,8 @@ class UserViewSet(viewsets.ModelViewSet):
             # Only admins can delete users
             permission_classes = [CustomIsAdminUser]
         elif self.action == 'list':
-            # Only admins can list all users
-            permission_classes = [CustomIsAdminUser]
+            # Allow any authenticated user to list users for messaging
+            permission_classes = [IsAuthenticated]
         else:
             # For retrieve and other actions, users can view their own profile
             permission_classes = [IsOwnerOrAdmin]
@@ -72,13 +72,23 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Filter queryset based on user permissions
         """
-        queryset = super().get_queryset()
-          # If user is admin, return all users
-        if self.request.user.is_staff or self.request.user.is_superuser:
-            return queryset
+        # Start with all users, potentially pre-filtered by is_active if desired globally
+        queryset = super().get_queryset() 
+
+        if self.action == 'list':
+            # For the list action (used for selecting message recipients),
+            # return all active users. Frontend can filter out the current user.
+            return queryset.filter(is_active=True)
         
-        # Regular users can only see their own profile
-        return queryset.filter(id=self.request.user.id)
+        # For other actions like 'retrieve', 'update', 'partial_update', 'destroy':
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            # Staff/admins can see/manage all users (respecting action-specific permissions like IsOwnerOrAdmin)
+            # for these specific actions.
+            return queryset.filter(is_active=True) # Or just queryset if inactive should be manageable
+        
+        # Regular users, for actions other than 'list', can typically only see/manage their own profile.
+        # Ensure they are active to access their own details.
+        return queryset.filter(id=self.request.user.id, is_active=True)
     
     def perform_create(self, serializer):
         """Create user with automatic profile creation"""
