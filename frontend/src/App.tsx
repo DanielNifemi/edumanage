@@ -15,10 +15,10 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext"; // Added AuthProvider import
 
 // Dashboard components
-import StudentDashboardPage from './pages/StudentDashboardPage'; // Added import
-import TeacherDashboardPage from './pages/TeacherDashboardPage'; // Added import
-import AdminDashboardPage from './pages/AdminDashboardPage';   // Added import
-import StaffDashboardPage from './pages/StaffDashboardPage';     // Added import
+import StudentDashboard from './pages/dashboards/StudentDashboard';
+import TeacherDashboard from './pages/dashboards/TeacherDashboard';
+import AdminDashboard from './pages/dashboards/AdminDashboard';
+import StaffDashboard from './pages/dashboards/StaffDashboard';
 
 // Page components (Placeholder imports - create these components as needed)
 const UsersList = () => <div>Users List</div>;             // Placeholder
@@ -36,6 +36,7 @@ const CourseDetails = () => <div>Course Details</div>;       // Placeholder
 
 import Assignments from "./pages/assignments/Assignments";
 import ProfilePage from "./pages/ProfilePage";
+import ProfileEditPage from "./pages/ProfileEditPage"; // Import the new edit page
 import NotificationsPage from './pages/NotificationsPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import CoursesCatalog from './pages/courses/CoursesCatalog'; // Added import for CoursesCatalog
@@ -64,13 +65,14 @@ const App = () => (
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               {/* Dashboard Routes */}
-              <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-              <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-              <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
+              <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route path="/staff/dashboard" element={<StaffDashboard />} />
             
               {/* Profile, Notifications, Announcements */}
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/edit" element={<ProfileEditPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/announcements" element={<AnnouncementsPage />} />
             

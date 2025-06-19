@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { UserPlus, FileSpreadsheet, CalendarCheck2, Settings, HelpCircle } from 'lucide-react';
+import { UserPlus, FileSpreadsheet, CalendarCheck2, Settings, HelpCircle, BarChart3 } from 'lucide-react';
 
 // Mock Data Interfaces (Simplified for Staff)
 interface StaffQuickLink {

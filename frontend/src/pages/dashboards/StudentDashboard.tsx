@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/useAuth';
-import DashboardLayout from '@/components/layout/DashboardLayout'; // Added DashboardLayout import
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +48,6 @@ const StudentDashboard = () => {
   };
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg p-6 text-white">
@@ -131,9 +129,11 @@ const StudentDashboard = () => {
                   </div>
                 ))}
               </div>
-              <Button variant="outline" className="w-full mt-4" size="sm">
-                View All Announcements
-              </Button>
+              <Link to="/announcements">
+                <Button variant="outline" className="w-full mt-4" size="sm">
+                  View All Announcements
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
@@ -179,7 +179,6 @@ const StudentDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 };
 

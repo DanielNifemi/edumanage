@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Briefcase, CalendarCheck, Settings, UserPlus, FileText, Building, Bell } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import DashboardLayout from "@/components/layout/DashboardLayout";
 
 const StaffDashboard = () => {
   const { user } = useAuth();
@@ -36,7 +35,6 @@ const StaffDashboard = () => {
   };
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Welcome Section */}
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg p-6 text-white">
@@ -145,7 +143,6 @@ const StaffDashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 };
 
