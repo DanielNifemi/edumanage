@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-default-secret-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app', '*']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0').split(',') + ['.vercel.app']
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
@@ -36,9 +36,28 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8080',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://0.0.0.0:3000',  # Added for Docker
 ]
-CORS_ALLOW_ALL_ORIGINS = True  # Temporary for debugging
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'True').lower() in ['true', '1', 'yes']
 CORS_ALLOW_CREDENTIALS = True
+
+# Add CORS debugging
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Exempt API endpoints from CSRF protection
+CSRF_EXEMPT_URLS = [
+    r'^/api/.*$',
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
@@ -47,6 +66,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8080',
     'http://localhost:5173',  # Added for Vite dev server
     'http://127.0.0.1:5173', # Added for Vite dev server
+    'http://0.0.0.0:3000',  # Added for Docker
 ]
 
 # Application definition
@@ -191,12 +211,25 @@ WSGI_APPLICATION = 'edumanage.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Check if we're running in Docker or using PostgreSQL
+if os.getenv('DATABASE_URL') or os.getenv('POSTGRES_DB'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'edumanage'),
+            'USER': os.getenv('POSTGRES_USER', 'edumanage_user'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'edumanage_password'),
+            'HOST': os.getenv('DB_HOST', 'db'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -236,6 +269,7 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # For collectstatic in production/Docker
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

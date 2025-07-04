@@ -1,8 +1,13 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from ..models import Exam, ExamResult
+from django.utils import timezone
+from ..models import (
+    Exam, ExamResult, Test, Question, Answer, 
+    TestAttempt, StudentAnswer
+)
 from students.models import Student
 from teachers.models import Teacher
+from courses.models import Course
 
 User = get_user_model()
 
@@ -27,164 +32,208 @@ class StudentBasicSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'student_id']
 
 
+class CourseBasicSerializer(serializers.ModelSerializer):
+    """Basic serializer for course in exam context"""
+    class Meta:
+        model = Course
+        fields = ['id', 'title', 'code']
+        read_only_fields = ['id']
+
+
+# Enhanced Exam Serializers
 class ExamSerializer(serializers.ModelSerializer):
-    """Serializer for Exam model"""
+    """Enhanced serializer for Exam model"""
     created_by_name = serializers.CharField(source='created_by.user.get_full_name', read_only=True)
+    course_name = serializers.CharField(source='course.title', read_only=True)
     student_count = serializers.SerializerMethodField()
     average_score = serializers.SerializerMethodField()
+    is_active = serializers.ReadOnlyField()
+    is_upcoming = serializers.ReadOnlyField()
+    is_completed = serializers.ReadOnlyField()
     
     class Meta:
         model = Exam
         fields = [
-            'id', 'name', 'date', 'subject', 'created_by',
-            'created_by_name', 'student_count', 'average_score'
+            'id', 'title', 'description', 'exam_type', 'course', 'course_name',
+            'subject', 'created_by', 'created_by_name', 'date', 'start_time', 
+            'end_time', 'duration_minutes', 'max_marks', 'passing_marks',
+            'instructions', 'allow_late_submission', 'late_penalty_percent',
+            'randomize_questions', 'show_results_immediately', 'status',
+            'student_count', 'average_score', 'is_active', 'is_upcoming', 
+            'is_completed', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'created_at', 'updated_at']
     
     def get_student_count(self, obj):
         return obj.students.count()
     
     def get_average_score(self, obj):
-        results = obj.examresult_set.filter(is_graded=True)
-        if results:
-            return round(sum(result.score for result in results) / len(results), 2)
+        results = obj.results.filter(is_graded=True)
+        if results.exists():
+            scores = [result.score for result in results if result.score is not None]
+            return round(sum(scores) / len(scores), 2) if scores else None
         return None
-
-
 class ExamResultSerializer(serializers.ModelSerializer):
-    """Serializer for Exam Result model"""
-    exam_name = serializers.CharField(source='exam.name', read_only=True)
+    """Enhanced serializer for Exam Result model"""
+    exam_title = serializers.CharField(source='exam.title', read_only=True)
     student_name = serializers.CharField(source='student.user.get_full_name', read_only=True)
     student_id = serializers.CharField(source='student.student_id', read_only=True)
     graded_by_name = serializers.CharField(source='graded_by.user.get_full_name', read_only=True)
-    grade_letter = serializers.SerializerMethodField()
+    is_passed = serializers.ReadOnlyField()
     
     class Meta:
         model = ExamResult
         fields = [
-            'id', 'exam', 'student', 'score', 'is_graded',
-            'graded_by', 'grade_comment', 'exam_name', 'student_name',
-            'student_id', 'graded_by_name', 'grade_letter'
+            'id', 'exam', 'student', 'score', 'percentage', 'grade_letter',
+            'is_graded', 'graded_by', 'graded_at', 'grade_comment', 'teacher_feedback',
+            'started_at', 'submitted_at', 'time_taken_minutes', 'is_submitted',
+            'is_late', 'attempt_number', 'exam_title', 'student_name',
+            'student_id', 'graded_by_name', 'is_passed', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id']
-    
-    def get_grade_letter(self, obj):
-        """Convert score to letter grade"""
-        if obj.score >= 90:
-            return 'A'
-        elif obj.score >= 80:
-            return 'B'
-        elif obj.score >= 70:
-            return 'C'
-        elif obj.score >= 60:
-            return 'D'
-        else:
-            return 'F'
-
-
-class ExamDetailSerializer(serializers.ModelSerializer):
-    """Detailed serializer for exam with results"""
-    created_by = TeacherBasicSerializer(read_only=True)
-    results = ExamResultSerializer(source='examresult_set', many=True, read_only=True)
-    statistics = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Exam
-        fields = [
-            'id', 'name', 'date', 'subject', 'created_by',
-            'results', 'statistics'
-        ]
-        read_only_fields = ['id']
-    
-    def get_statistics(self, obj):
-        results = obj.examresult_set.filter(is_graded=True)
-        if not results:
-            return None
-            
-        scores = [result.score for result in results]
-        return {
-            'total_students': len(scores),
-            'average_score': round(sum(scores) / len(scores), 2) if scores else 0,
-            'highest_score': max(scores) if scores else 0,
-            'lowest_score': min(scores) if scores else 0,
-            'pass_rate': len([s for s in scores if s >= 60]) / len(scores) * 100 if scores else 0
-        }
+        read_only_fields = ['id', 'percentage', 'grade_letter', 'is_passed', 'created_at', 'updated_at']
 
 
 class ExamCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating exams"""
     student_ids = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Student.objects.all(), source='students', write_only=True
+        many=True, queryset=Student.objects.all(), write_only=True
     )
     
     class Meta:
         model = Exam
-        fields = ['name', 'date', 'subject', 'created_by', 'student_ids']
+        fields = [
+            'title', 'description', 'exam_type', 'course', 'subject',
+            'date', 'start_time', 'end_time', 'duration_minutes',
+            'max_marks', 'passing_marks', 'instructions',
+            'allow_late_submission', 'late_penalty_percent',
+            'randomize_questions', 'show_results_immediately',
+            'status', 'student_ids'
+        ]
     
     def create(self, validated_data):
-        students = validated_data.pop('students', [])
+        student_ids = validated_data.pop('student_ids', [])
         exam = Exam.objects.create(**validated_data)
         
-        # Create exam results for all students
+        # Create exam results for selected students
         exam_results = []
-        for student in students:
+        for student in student_ids:
             exam_results.append(
-                ExamResult(exam=exam, student=student, score=0, is_graded=False)
+                ExamResult(exam=exam, student=student)
             )
         ExamResult.objects.bulk_create(exam_results)
         
         return exam
 
 
-class BulkGradeSerializer(serializers.Serializer):
-    """Serializer for bulk grading"""
-    results = serializers.ListField(
-        child=serializers.DictField(
-            child=serializers.CharField()
-        )
-    )
-    graded_by = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())
+# Test/Quiz Serializers
+class AnswerSerializer(serializers.ModelSerializer):
+    """Serializer for answer choices"""
+    class Meta:
+        model = Answer
+        fields = ['id', 'answer_text', 'is_correct', 'order', 'image']
+        read_only_fields = ['id']
+
+
+class QuestionSerializer(serializers.ModelSerializer):
+    """Serializer for test questions"""
+    answers = AnswerSerializer(many=True, read_only=True)
     
-    def update_grades(self):
-        graded_by = self.validated_data['graded_by']
-        results_data = self.validated_data['results']
-        
-        updated_results = []
-        for result_data in results_data:
-            try:
-                result = ExamResult.objects.get(id=result_data['id'])
-                result.score = int(result_data['score'])
-                result.grade_comment = result_data.get('grade_comment', '')
-                result.graded_by = graded_by
-                result.is_graded = True
-                updated_results.append(result)
-            except (ExamResult.DoesNotExist, ValueError):
-                continue
-        
-        ExamResult.objects.bulk_update(
-            updated_results, 
-            ['score', 'grade_comment', 'graded_by', 'is_graded']
-        )
-        return updated_results
+    class Meta:
+        model = Question
+        fields = [
+            'id', 'question_text', 'question_type', 'points', 'order',
+            'image', 'explanation', 'is_required', 'time_limit_seconds',
+            'answers'
+        ]
+        read_only_fields = ['id']
 
 
-class BulkGradingSerializer(serializers.Serializer):
-    """Serializer for bulk grading operations"""
+class TestSerializer(serializers.ModelSerializer):
+    """Serializer for Test model"""
+    created_by_name = serializers.CharField(source='created_by.user.get_full_name', read_only=True)
+    course_name = serializers.CharField(source='course.title', read_only=True)
+    question_count = serializers.ReadOnlyField()
+    is_available = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = Test
+        fields = [
+            'id', 'title', 'description', 'test_type', 'course', 'course_name',
+            'created_by', 'created_by_name', 'available_from', 'available_until',
+            'time_limit_minutes', 'max_attempts', 'shuffle_questions',
+            'shuffle_answers', 'question_display', 'show_correct_answers',
+            'show_feedback', 'total_points', 'passing_score', 'is_published',
+            'question_count', 'is_available', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'total_points', 'created_at', 'updated_at']
+
+
+class TestDetailSerializer(TestSerializer):
+    """Detailed serializer for test with questions"""
+    questions = QuestionSerializer(many=True, read_only=True)
+    
+    class Meta(TestSerializer.Meta):
+        fields = TestSerializer.Meta.fields + ['questions']
+
+
+class StudentAnswerSerializer(serializers.ModelSerializer):
+    """Serializer for student answers"""
+    question_text = serializers.CharField(source='question.question_text', read_only=True)
+    is_correct = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = StudentAnswer
+        fields = [
+            'id', 'question', 'question_text', 'selected_answer', 'text_answer',
+            'points_earned', 'teacher_feedback', 'is_graded', 'is_correct',
+            'time_spent_seconds', 'answered_at'
+        ]
+        read_only_fields = ['id', 'answered_at']
+
+
+class TestAttemptSerializer(serializers.ModelSerializer):
+    """Serializer for test attempts"""
+    test_title = serializers.CharField(source='test.title', read_only=True)
+    student_name = serializers.CharField(source='student.user.get_full_name', read_only=True)
+    is_passed = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = TestAttempt
+        fields = [
+            'id', 'test', 'student', 'test_title', 'student_name',
+            'started_at', 'submitted_at', 'time_taken_seconds',
+            'score', 'percentage', 'is_graded', 'graded_by', 'graded_at',
+            'is_submitted', 'is_completed', 'attempt_number', 'is_passed',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class TestAttemptDetailSerializer(TestAttemptSerializer):
+    """Detailed serializer for test attempts with answers"""
+    student_answers = StudentAnswerSerializer(many=True, read_only=True)
+    
+    class Meta(TestAttemptSerializer.Meta):
+        fields = TestAttemptSerializer.Meta.fields + ['student_answers']
+
+
+# Grading Serializers
+class BulkGradeExamSerializer(serializers.Serializer):
+    """Serializer for bulk grading exams"""
     exam_results = serializers.ListField(
         child=serializers.DictField(), 
-        help_text="List of exam result updates"
+        help_text="List of exam result updates with result_id, score, and optional comments"
     )
     
     def validate_exam_results(self, value):
-        """Validate exam results data"""
         if not value:
             raise serializers.ValidationError("At least one exam result must be provided")
         
-        required_fields = ['result_id', 'score']
         for result_data in value:
-            for field in required_fields:
-                if field not in result_data:
-                    raise serializers.ValidationError(f"Field '{field}' is required for each result")
+            if 'result_id' not in result_data:
+                raise serializers.ValidationError("result_id is required for each result")
+            if 'score' not in result_data:
+                raise serializers.ValidationError("score is required for each result")
             
             try:
                 float(result_data['score'])
@@ -194,40 +243,32 @@ class BulkGradingSerializer(serializers.Serializer):
         return value
 
 
-class ExamResultDetailSerializer(serializers.ModelSerializer):
-    """Detailed serializer for exam results with complete information"""
-    exam = ExamSerializer(read_only=True)
-    student = StudentBasicSerializer(read_only=True)
-    graded_by = TeacherBasicSerializer(read_only=True)
-    grade_letter = serializers.SerializerMethodField()
-    percentage = serializers.SerializerMethodField()
+class BulkGradeTestSerializer(serializers.Serializer):
+    """Serializer for bulk grading test answers"""
+    student_answers = serializers.ListField(
+        child=serializers.DictField(),
+        help_text="List of student answer updates with answer_id, points_earned, and optional feedback"
+    )
     
-    class Meta:
-        model = ExamResult
-        fields = [
-            'id', 'exam', 'student', 'score', 'is_graded',
-            'graded_by', 'grade_comment', 'grade_letter', 'percentage'
-        ]
-        read_only_fields = ['id']
-    
-    def get_grade_letter(self, obj):
-        """Convert score to letter grade"""
-        if obj.score >= 90:
-            return 'A'
-        elif obj.score >= 80:
-            return 'B'
-        elif obj.score >= 70:
-            return 'C'
-        elif obj.score >= 60:
-            return 'D'
-        else:
-            return 'F'
-    
-    def get_percentage(self, obj):
-        """Get percentage score - assuming max score is 100"""
-        return obj.score
+    def validate_student_answers(self, value):
+        if not value:
+            raise serializers.ValidationError("At least one student answer must be provided")
+        
+        for answer_data in value:
+            if 'answer_id' not in answer_data:
+                raise serializers.ValidationError("answer_id is required for each answer")
+            if 'points_earned' not in answer_data:
+                raise serializers.ValidationError("points_earned is required for each answer")
+            
+            try:
+                float(answer_data['points_earned'])
+            except (ValueError, TypeError):
+                raise serializers.ValidationError("Points earned must be a valid number")
+        
+        return value
 
 
+# Statistics Serializers
 class ExamStatsSerializer(serializers.Serializer):
     """Serializer for exam statistics"""
     total_exams = serializers.IntegerField()
@@ -238,8 +279,13 @@ class ExamStatsSerializer(serializers.Serializer):
     lowest_score = serializers.FloatField()
     pass_rate = serializers.FloatField()
     recent_exams = ExamSerializer(many=True)
-    top_performers = serializers.SerializerMethodField()  # Changed to avoid circular reference
     
-    def get_top_performers(self, obj):
-        # Return basic info instead of full serializer to avoid circular import
-        return obj.get('top_performers', [])
+    
+class TestStatsSerializer(serializers.Serializer):
+    """Serializer for test statistics"""
+    total_tests = serializers.IntegerField()
+    tests_this_month = serializers.IntegerField()
+    total_attempts = serializers.IntegerField()
+    average_score = serializers.FloatField()
+    completion_rate = serializers.FloatField()
+    recent_tests = TestSerializer(many=True)

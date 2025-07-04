@@ -156,6 +156,103 @@ export interface ReceivedMessageData {
   recipient_name?: string;
 }
 
+// Examination/Assessment related interfaces
+export interface ExamData {
+  id?: number;
+  title: string;
+  description?: string;
+  course: number;
+  course_title?: string;
+  total_marks: number;
+  passing_marks: number;
+  duration: number; // in minutes
+  exam_date: string;
+  start_time: string;
+  end_time: string;
+  is_published: boolean;
+  instructions?: string;
+  created_by?: number;
+  created_by_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface TestData {
+  id?: number;
+  title: string;
+  description?: string;
+  course: number;
+  course_title?: string;
+  total_marks: number;
+  passing_marks: number;
+  duration: number; // in minutes
+  max_attempts: number;
+  is_published: boolean;
+  instructions?: string;
+  created_by?: number;
+  created_by_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface QuestionData {
+  id?: number;
+  test: number;
+  question_text: string;
+  question_type: 'multiple_choice' | 'true_false' | 'short_answer' | 'essay';
+  marks: number;
+  order: number;
+  is_required: boolean;
+}
+
+export interface AnswerData {
+  id?: number;
+  question: number;
+  answer_text: string;
+  is_correct: boolean;
+  order: number;
+}
+
+export interface TestAttemptData {
+  id?: number;
+  test: number;
+  test_title?: string;
+  student: number;
+  student_name?: string;
+  start_time: string;
+  end_time?: string;
+  score?: number;
+  is_submitted: boolean;
+  attempt_number: number;
+  created_at?: string;
+}
+
+export interface StudentAnswerData {
+  id?: number;
+  test_attempt: number;
+  question: number;
+  answer_text?: string;
+  selected_answer?: number;
+  marks_awarded?: number;
+}
+
+export interface ExamResultData {
+  id?: number;
+  exam: number;
+  exam_title?: string;
+  student: number;
+  student_name?: string;
+  marks_obtained: number;
+  percentage: number;
+  grade?: string;
+  is_passed: boolean;
+  exam_date: string;
+  graded_by?: number;
+  graded_by_name?: string;
+  feedback?: string;
+  created_at?: string;
+}
+
 const API_BASE_URL = 'http://localhost:8000/api'; // Adjusted to match backend DRF routes
 
 const api = axios.create({
@@ -167,8 +264,8 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Function to get CSRF token from cookies
-    function getCookie(name: string) {
-      let cookieValue = null;
+    function getCookie(name: string): string | null {
+      let cookieValue: string | null = null;
       if (document.cookie && document.cookie !== '') {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
@@ -224,8 +321,7 @@ api.interceptors.response.use(
 // Auth API calls
 export const authAPI = {
   login: async (email: string, password: string) => {
-    // const response = await api.post(\'/auth/login/\', { email, password });
-    const response = await api.post('/auth/login/', { email, password }); // Adjusted path
+    const response = await api.post('/auth/login/', { email, password });
     return response.data;
   },
 
@@ -238,44 +334,37 @@ export const authAPI = {
     last_name: string;
     user_type: 'student' | 'teacher' | 'staff' | 'admin';
   }) => {
-    // const response = await api.post(\'/auth/register/\', userData);
-    const response = await api.post('/auth/register/', userData); // Adjusted path
+    const response = await api.post('/auth/register/', userData);
     return response.data;
   },
 
   getProfile: async () => {
-    // const response = await api.get(\'/auth/profile/\');
-    const response = await api.get('/auth/user/'); // Adjusted path to /api/accounts/user/
+    const response = await api.get('/auth/user/');
     return response.data;
   },
 
   logout: async () => {
-    // const response = await api.post(\'/auth/logout/\');
-    const response = await api.post('/auth/logout/'); // Adjusted path
+    const response = await api.post('/auth/logout/');
     return response.data;
   },
 
-  // Assuming these paths also need to be relative to /api/accounts/
   forgotPassword: async (email: string) => {
-    // const response = await api.post(\'/auth/forgot-password/\', { email });
-    const response = await api.post('/auth/forgot-password/', { email }); // Adjusted path
+    const response = await api.post('/auth/forgot-password/', { email });
     return response.data;
   },
 
   resetPassword: async (token: string, password: string) => {
-    // const response = await api.post(\'/auth/reset-password/\', { token, password });
-    const response = await api.post('/auth/reset-password/', { token, password }); // Adjusted path
+    const response = await api.post('/auth/reset-password/', { token, password });
     return response.data;
   },
 
   verifyEmail: async (token: string) => {
-    // const response = await api.post(\'/auth/verify-email/\', { token });
-    const response = await api.post('/auth/verify-email/', { token }); // Adjusted path
+    const response = await api.post('/auth/verify-email/', { token });
     return response.data;
   },
 
   updateProfile: async (userId: string, data: UserProfileUpdateData) => {
-    const response = await api.patch(`/auth/users/${userId}/`, data); // Using PATCH for partial updates
+    const response = await api.patch(`/auth/users/${userId}/`, data);
     return response.data;
   },
 };
@@ -382,12 +471,22 @@ export const attendanceAPI = {
 // Schedules API
 export const schedulesAPI = {
   getByUser: async (userType: string, userId: string) => {
-    const response = await api.get(`/schedules/${userType}/${userId}/`);
-    return response.data;
+    // Use the correct backend endpoints 
+    if (userType === 'teacher') {
+      const response = await api.get(`/schedules/schedules/by-teacher/?teacher_id=${userId}`);
+      return response.data;
+    } else if (userType === 'student') {
+      const response = await api.get(`/schedules/schedules/by-class/?class_id=${userId}`);
+      return response.data;
+    } else {
+      // For general users, get all schedules
+      const response = await api.get('/schedules/schedules/');
+      return response.data;
+    }
   },
 
   getAll: async () => {
-    const response = await api.get('/schedules/');
+    const response = await api.get('/schedules/schedules/');
     return response.data;
   },
 };
@@ -549,10 +648,181 @@ export const announcementsAPI = {
 // Accounts API - Add getUsers if it's not already present or correctly defined
 export const accountsAPI = {
   getUsers: async (): Promise<UserBasicData[]> => {
-    const response = await api.get<UserBasicData[]>('/auth/users/'); // Corrected path
+    const response = await api.get<UserBasicData[]>('/auth/users/');
     return response.data;
   },
   // ... any other existing accountsAPI methods
+};
+
+// Examinations API calls
+export const examinationsAPI = {
+  // Exams
+  getExams: async () => {
+    const response = await api.get('/examinations/exams/');
+    return response.data;
+  },
+  getExam: async (examId: number) => {
+    const response = await api.get(`/examinations/exams/${examId}/`);
+    return response.data;
+  },
+  createExam: async (data: ExamData) => {
+    const response = await api.post('/examinations/exams/', data);
+    return response.data;
+  },
+  updateExam: async (examId: number, data: Partial<ExamData>) => {
+    const response = await api.patch(`/examinations/exams/${examId}/`, data);
+    return response.data;
+  },
+  deleteExam: async (examId: number) => {
+    const response = await api.delete(`/examinations/exams/${examId}/`);
+    return response.data;
+  },
+  publishExam: async (examId: number) => {
+    const response = await api.post(`/examinations/exams/${examId}/publish/`);
+    return response.data;
+  },
+
+  // Tests
+  getTests: async () => {
+    const response = await api.get('/examinations/tests/');
+    return response.data;
+  },
+  getTest: async (testId: number) => {
+    const response = await api.get(`/examinations/tests/${testId}/`);
+    return response.data;
+  },
+  createTest: async (data: TestData) => {
+    const response = await api.post('/examinations/tests/', data);
+    return response.data;
+  },
+  updateTest: async (testId: number, data: Partial<TestData>) => {
+    const response = await api.patch(`/examinations/tests/${testId}/`, data);
+    return response.data;
+  },
+  deleteTest: async (testId: number) => {
+    const response = await api.delete(`/examinations/tests/${testId}/`);
+    return response.data;
+  },
+  publishTest: async (testId: number) => {
+    const response = await api.post(`/examinations/tests/${testId}/publish/`);
+    return response.data;
+  },
+
+  // Questions
+  getQuestions: async (testId?: number) => {
+    const url = testId ? `/examinations/questions/?test=${testId}` : '/examinations/questions/';
+    const response = await api.get(url);
+    return response.data;
+  },
+  getQuestion: async (questionId: number) => {
+    const response = await api.get(`/examinations/questions/${questionId}/`);
+    return response.data;
+  },
+  createQuestion: async (data: QuestionData) => {
+    const response = await api.post('/examinations/questions/', data);
+    return response.data;
+  },
+  updateQuestion: async (questionId: number, data: Partial<QuestionData>) => {
+    const response = await api.patch(`/examinations/questions/${questionId}/`, data);
+    return response.data;
+  },
+  deleteQuestion: async (questionId: number) => {
+    const response = await api.delete(`/examinations/questions/${questionId}/`);
+    return response.data;
+  },
+
+  // Answers
+  getAnswers: async (questionId?: number) => {
+    const url = questionId ? `/examinations/answers/?question=${questionId}` : '/examinations/answers/';
+    const response = await api.get(url);
+    return response.data;
+  },
+  createAnswer: async (data: AnswerData) => {
+    const response = await api.post('/examinations/answers/', data);
+    return response.data;
+  },
+  updateAnswer: async (answerId: number, data: Partial<AnswerData>) => {
+    const response = await api.patch(`/examinations/answers/${answerId}/`, data);
+    return response.data;
+  },
+  deleteAnswer: async (answerId: number) => {
+    const response = await api.delete(`/examinations/answers/${answerId}/`);
+    return response.data;
+  },
+
+  // Test Attempts
+  getTestAttempts: async (testId?: number, studentId?: number) => {
+    let url = '/examinations/test-attempts/';
+    const params: string[] = [];
+    if (testId) params.push(`test=${testId}`);
+    if (studentId) params.push(`student=${studentId}`);
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
+    }
+    const response = await api.get(url);
+    return response.data;
+  },
+  getTestAttempt: async (attemptId: number) => {
+    const response = await api.get(`/examinations/test-attempts/${attemptId}/`);
+    return response.data;
+  },
+  createTestAttempt: async (data: Partial<TestAttemptData>) => {
+    const response = await api.post('/examinations/test-attempts/', data);
+    return response.data;
+  },
+  updateTestAttempt: async (attemptId: number, data: Partial<TestAttemptData>) => {
+    const response = await api.patch(`/examinations/test-attempts/${attemptId}/`, data);
+    return response.data;
+  },
+  submitTestAttempt: async (attemptId: number) => {
+    const response = await api.post(`/examinations/test-attempts/${attemptId}/submit/`);
+    return response.data;
+  },
+
+  // Exam Results
+  getExamResults: async (examId?: number, studentId?: number) => {
+    let url = '/examinations/exam-results/';
+    const params: string[] = [];
+    if (examId) params.push(`exam=${examId}`);
+    if (studentId) params.push(`student=${studentId}`);
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
+    }
+    const response = await api.get(url);
+    return response.data;
+  },
+  getExamResult: async (resultId: number) => {
+    const response = await api.get(`/examinations/exam-results/${resultId}/`);
+    return response.data;
+  },
+  createExamResult: async (data: ExamResultData) => {
+    const response = await api.post('/examinations/exam-results/', data);
+    return response.data;
+  },
+  updateExamResult: async (resultId: number, data: Partial<ExamResultData>) => {
+    const response = await api.patch(`/examinations/exam-results/${resultId}/`, data);
+    return response.data;
+  },
+  deleteExamResult: async (resultId: number) => {
+    const response = await api.delete(`/examinations/exam-results/${resultId}/`);
+    return response.data;
+  },
+
+  // Student Answers (for grading)
+  getStudentAnswers: async (attemptId: number) => {
+    const response = await api.get(`/examinations/student-answers/?test_attempt=${attemptId}`);
+    return response.data;
+  },
+  updateStudentAnswer: async (answerId: number, data: Partial<StudentAnswerData>) => {
+    const response = await api.patch(`/examinations/student-answers/${answerId}/`, data);
+    return response.data;
+  },
+
+  // Additional helper functions
+  getAssessmentStats: async (assessmentType: 'exams' | 'tests', assessmentId: number) => {
+    const response = await api.get(`/examinations/${assessmentType}/${assessmentId}/stats/`);
+    return response.data;
+  },
 };
 
 export default api;

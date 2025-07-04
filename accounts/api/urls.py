@@ -11,6 +11,9 @@ urlpatterns = [
     # ViewSet URLs
     path('', include(router.urls)),
     
+    # Test endpoint for debugging
+    path('test/', views.test_endpoint, name='api_test'),
+    
     # Authentication URLs (function-based views)
     path('csrf/', views.csrf_token_view, name='api_csrf_token'),
     path('user/', views.current_user_view, name='api_current_user'),

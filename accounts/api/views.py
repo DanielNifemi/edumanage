@@ -239,9 +239,22 @@ class UserProfileViewSet(viewsets.ModelViewSet):
 
 # Authentication API Views (function-based for specific auth operations)
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@csrf_exempt
+def test_endpoint(request):
+    """Test endpoint to debug frontend requests"""
+    return Response({
+        'received_data': request.data,
+        'content_type': request.content_type,
+        'method': request.method,
+        'headers': dict(request.headers)
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+@csrf_exempt  # Moved decorator here to be more explicit
 def login_view(request):
     """API endpoint for user login"""
     serializer = LoginSerializer(data=request.data, context={'request': request})

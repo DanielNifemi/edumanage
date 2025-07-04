@@ -1,0 +1,49 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - staticfiles:/app/staticfiles
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - edumanage-network
+
+  db:
+    image: postgres:15
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - edumanage-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - web
+    networks:
+      - edumanage-network
+
+volumes:
+  postgres_data:
+  staticfiles:
+
+networks:
+  edumanage-network:
+    driver: bridge
