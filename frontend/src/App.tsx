@@ -25,14 +25,13 @@ const UsersList = () => <div>Users List</div>;             // Placeholder
 const AdminReports = () => <div>Admin Reports</div>;         // Placeholder
 const AdminSettings = () => <div>Admin Settings</div>;       // Placeholder
 const TeacherClasses = () => <div>Teacher Classes</div>;       // Placeholder
+const TeacherAssignments = () => <div>Teacher Assignments</div>; // Placeholder
 const TeacherAttendance = () => <div>Teacher Attendance</div>;   // Placeholder
 const StaffReports = () => <div>Staff Reports</div>;         // Placeholder
 const StudentsList = () => <div>Students List</div>;         // Placeholder
 const Attendance = () => <div>Attendance Page</div>;         // Placeholder
 const TeachersList = () => <div>Teachers List</div>;         // Placeholder
 const CourseDetails = () => <div>Course Details</div>;       // Placeholder
-
-import TeacherAssessments from "./pages/teachers/TeacherAssessments"; // Import our real component
 
 
 import Assignments from "./pages/assignments/Assignments";
@@ -45,6 +44,9 @@ import SchedulePage from './pages/SchedulePage'; // Added import
 import MessagesPage from './pages/MessagesPage'; // Added import
 import SettingsPage from './pages/SettingsPage'; // Added import
 import CreateCoursePage from './pages/teacher/CreateCoursePage'; // Corrected import path
+import TeacherAnnouncements from './pages/teachers/TeacherAnnouncements';
+import CreateAnnouncement from './pages/teachers/CreateAnnouncement';
+import ViewAnnouncement from './pages/teachers/ViewAnnouncement';
 
 const queryClient = new QueryClient();
 
@@ -84,10 +86,13 @@ const App = () => (
             
               {/* Teacher Routes */}
               <Route path="/teacher/classes" element={<TeacherClasses />} />
-              <Route path="/teacher/assignments" element={<TeacherAssessments />} />
-              <Route path="/teacher/assessments" element={<TeacherAssessments />} />
+              <Route path="/teacher/assignments" element={<TeacherAssignments />} />
               <Route path="/teacher/attendance" element={<TeacherAttendance />} />
               <Route path="/teacher/courses/new" element={<CreateCoursePage />} /> {/* Added route for creating new course */}
+              <Route path="/teacher/announcements" element={<TeacherAnnouncements />} />
+              <Route path="/teacher/announcements/new" element={<CreateAnnouncement />} />
+              <Route path="/teacher/announcements/:id" element={<ViewAnnouncement />} />
+              <Route path="/teacher/announcements/:id/edit" element={<CreateAnnouncement />} />
             
               {/* Staff Routes */}
               <Route path="/staff/reports" element={<StaffReports />} />

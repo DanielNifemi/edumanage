@@ -443,8 +443,9 @@ const TeacherAssessments = () => {
   };
 
   const getSubmissionProgress = (assessment: Assessment) => {
-    if (!assessment.totalStudents || assessment.totalStudents === 0) return 0;
-    return ((assessment.submissionsCount || 0) / assessment.totalStudents) * 100;
+    const submissions = assessment.submissionsCount || 0;
+    const total = assessment.totalStudents || 0;
+    return total > 0 ? (submissions / total) * 100 : 0;
   };
 
   const getGradingProgress = (assessment: Assessment) => {
