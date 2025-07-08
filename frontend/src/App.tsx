@@ -20,6 +20,11 @@ import TeacherDashboard from './pages/dashboards/TeacherDashboard';
 import AdminDashboard from './pages/dashboards/AdminDashboard';
 import StaffDashboard from './pages/dashboards/StaffDashboard';
 
+// Student components
+import StudentAssignments from './pages/students/StudentAssignments';
+import StudentAttendance from './pages/students/StudentAttendance';
+import StudentGrades from './pages/students/StudentGrades';
+
 // Page components (Placeholder imports - create these components as needed)
 const UsersList = () => <div>Users List</div>;             // Placeholder
 const AdminReports = () => <div>Admin Reports</div>;         // Placeholder
@@ -29,7 +34,6 @@ const TeacherAssignments = () => <div>Teacher Assignments</div>; // Placeholder
 const TeacherAttendance = () => <div>Teacher Attendance</div>;   // Placeholder
 const StaffReports = () => <div>Staff Reports</div>;         // Placeholder
 const StudentsList = () => <div>Students List</div>;         // Placeholder
-const Attendance = () => <div>Attendance Page</div>;         // Placeholder
 const TeachersList = () => <div>Teachers List</div>;         // Placeholder
 const CourseDetails = () => <div>Course Details</div>;       // Placeholder
 
@@ -88,18 +92,21 @@ const App = () => (
               <Route path="/teacher/classes" element={<TeacherClasses />} />
               <Route path="/teacher/assignments" element={<TeacherAssignments />} />
               <Route path="/teacher/attendance" element={<TeacherAttendance />} />
-              <Route path="/teacher/courses/new" element={<CreateCoursePage />} /> {/* Added route for creating new course */}
+              <Route path="/teacher/courses/new" element={<CreateCoursePage />} />
               <Route path="/teacher/announcements" element={<TeacherAnnouncements />} />
               <Route path="/teacher/announcements/new" element={<CreateAnnouncement />} />
               <Route path="/teacher/announcements/:id" element={<ViewAnnouncement />} />
               <Route path="/teacher/announcements/:id/edit" element={<CreateAnnouncement />} />
+              <Route path="/teacher/grades" element={<div>Teacher Grades - Coming Soon</div>} />
+              <Route path="/test-route" element={<div>Test Route Works!</div>} />
             
               {/* Staff Routes */}
               <Route path="/staff/reports" element={<StaffReports />} />
             
               {/* Student Routes */}
-              <Route path="/student/assignments" element={<Assignments />} />
-              <Route path="/student/attendance" element={<Attendance />} />
+              <Route path="/student/assignments" element={<StudentAssignments />} />
+              <Route path="/student/attendance" element={<StudentAttendance />} />
+              <Route path="/student/grades" element={<StudentGrades />} />
             
               {/* Teacher Management Routes */}
               <Route path="/teachers" element={<TeachersList />} />

@@ -473,10 +473,10 @@ export const schedulesAPI = {
   getByUser: async (userType: string, userId: string) => {
     // Use the correct backend endpoints 
     if (userType === 'teacher') {
-      const response = await api.get(`/schedules/schedules/by-teacher/?teacher_id=${userId}`);
+      const response = await api.get(`/schedules/by-teacher/?teacher_id=${userId}`);
       return response.data;
     } else if (userType === 'student') {
-      const response = await api.get(`/schedules/schedules/by-class/?class_id=${userId}`);
+      const response = await api.get(`/schedules/by-class/?class_id=${userId}`);
       return response.data;
     } else {
       // For general users, get all schedules
