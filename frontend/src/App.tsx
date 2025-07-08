@@ -24,6 +24,7 @@ import StaffDashboard from './pages/dashboards/StaffDashboard';
 import StudentAssignments from './pages/students/StudentAssignments';
 import StudentAttendance from './pages/students/StudentAttendance';
 import StudentGrades from './pages/students/StudentGrades';
+import StudentsList from './pages/students/StudentsList';
 
 // Page components (Placeholder imports - create these components as needed)
 const UsersList = () => <div>Users List</div>;             // Placeholder
@@ -33,7 +34,6 @@ const TeacherClasses = () => <div>Teacher Classes</div>;       // Placeholder
 const TeacherAssignments = () => <div>Teacher Assignments</div>; // Placeholder
 const TeacherAttendance = () => <div>Teacher Attendance</div>;   // Placeholder
 const StaffReports = () => <div>Staff Reports</div>;         // Placeholder
-const StudentsList = () => <div>Students List</div>;         // Placeholder
 const TeachersList = () => <div>Teachers List</div>;         // Placeholder
 const CourseDetails = () => <div>Course Details</div>;       // Placeholder
 

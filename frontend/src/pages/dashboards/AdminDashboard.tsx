@@ -166,7 +166,9 @@ const AdminDashboard = () => {
               <CardDescription>Fast access to common administrative tasks.</CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
+            {            [
+              { to: "/students", label: "Manage Students", icon: Users, color: "blue" },
+              { to: "/teachers", label: "Manage Teachers", icon: GraduationCap, color: "green" },
               { to: "/admin/users/create", label: "Add New User", icon: UserPlus, color: "blue" },
               { to: "/admin/reports", label: "View Reports", icon: BarChart3, color: "green" },
               { to: "/admin/settings", label: "System Settings", icon: Settings, color: "purple" },

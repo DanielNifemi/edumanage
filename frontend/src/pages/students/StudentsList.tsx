@@ -43,9 +43,119 @@ const StudentsList = () => {
   const loadStudents = async () => {
     try {
       setLoading(true);
-      const data = await studentsAPI.getAll();
-      setStudents(data);
+      
+      // Try to load from API first
+      try {
+        const data = await studentsAPI.getAll();
+        setStudents(data);
+      } catch (apiError) {
+        // If API fails, use mock data
+        console.log('API failed, using mock data:', apiError);
+        
+        // Mock data for development
+        const mockStudents: Student[] = [
+          {
+            id: '1',
+            username: 'john.doe',
+            email: 'john.doe@school.edu',
+            first_name: 'John',
+            last_name: 'Doe',
+            full_name: 'John Doe',
+            student_id: 'STU001',
+            grade_level: '10th Grade',
+            enrollment_date: '2024-09-01',
+            status: 'Active',
+            gpa: 3.8,
+            courses_count: 6,
+            attendance_rate: 95,
+            phone_number: '(555) 123-4567',
+            parent_guardian: 'Jane Doe',
+            address: '123 Main St, City, State 12345',
+          },
+          {
+            id: '2',
+            username: 'sarah.wilson',
+            email: 'sarah.wilson@school.edu',
+            first_name: 'Sarah',
+            last_name: 'Wilson',
+            full_name: 'Sarah Wilson',
+            student_id: 'STU002',
+            grade_level: '11th Grade',
+            enrollment_date: '2023-09-01',
+            status: 'Active',
+            gpa: 3.9,
+            courses_count: 7,
+            attendance_rate: 98,
+            phone_number: '(555) 234-5678',
+            parent_guardian: 'Mike Wilson',
+            address: '456 Oak Ave, City, State 12345',
+          },
+          {
+            id: '3',
+            username: 'alex.chen',
+            email: 'alex.chen@school.edu',
+            first_name: 'Alex',
+            last_name: 'Chen',
+            full_name: 'Alex Chen',
+            student_id: 'STU003',
+            grade_level: '12th Grade',
+            enrollment_date: '2022-09-01',
+            status: 'Active',
+            gpa: 3.7,
+            courses_count: 8,
+            attendance_rate: 92,
+            phone_number: '(555) 345-6789',
+            parent_guardian: 'Lisa Chen',
+            address: '789 Pine Rd, City, State 12345',
+          },
+          {
+            id: '4',
+            username: 'emma.taylor',
+            email: 'emma.taylor@school.edu',
+            first_name: 'Emma',
+            last_name: 'Taylor',
+            full_name: 'Emma Taylor',
+            student_id: 'STU004',
+            grade_level: '9th Grade',
+            enrollment_date: '2024-09-01',
+            status: 'Active',
+            gpa: 3.6,
+            courses_count: 5,
+            attendance_rate: 94,
+            phone_number: '(555) 456-7890',
+            parent_guardian: 'Robert Taylor',
+            address: '321 Elm St, City, State 12345',
+          },
+          {
+            id: '5',
+            username: 'michael.brown',
+            email: 'michael.brown@school.edu',
+            first_name: 'Michael',
+            last_name: 'Brown',
+            full_name: 'Michael Brown',
+            student_id: 'STU005',
+            grade_level: '10th Grade',
+            enrollment_date: '2024-09-01',
+            status: 'Inactive',
+            gpa: 3.4,
+            courses_count: 4,
+            attendance_rate: 88,
+            phone_number: '(555) 567-8901',
+            parent_guardian: 'Susan Brown',
+            address: '654 Maple Dr, City, State 12345',
+          },
+        ];
+        
+        setStudents(mockStudents);
+        
+        toast({
+          title: "Info",
+          description: "Using sample data. Connect to backend for real data.",
+          variant: "default",
+        });
+      }
     } catch (error) {
+      console.error('Error loading students:', error);
       toast({
         title: "Error",
         description: "Failed to load students data",
